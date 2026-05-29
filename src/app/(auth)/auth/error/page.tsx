@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { TriangleAlert } from "lucide-react";
@@ -13,10 +14,20 @@ const MESSAGES: Record<string, string> = {
 };
 
 export default function AuthErrorPage() {
+    return (
+        <Suspense fallback={<ErrorCard message="An unexpected error occurred." />}>
+            <AuthErrorContent />
+        </Suspense>
+    );
+}
+
+function AuthErrorContent() {
     const params = useSearchParams();
     const reason = params.get("reason") ?? "unknown";
-    const message = MESSAGES[reason] ?? "An unexpected error occurred.";
+    return <ErrorCard message={MESSAGES[reason] ?? "An unexpected error occurred."} />;
+}
 
+function ErrorCard({ message }: { message: string }) {
     return (
         <Card className="w-full max-w-sm">
             <CardHeader className="items-center text-center">

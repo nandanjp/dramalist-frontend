@@ -36,15 +36,12 @@ function NewReviewForm() {
         [showsData, preselectedShowId],
     );
 
-    const [selectedShow, setSelectedShow] = React.useState<Show | undefined>();
+    const [userSelectedShow, setUserSelectedShow] = React.useState<Show | undefined>();
+    const selectedShow = userSelectedShow ?? preselectedShow;
     const [rating, setRating] = React.useState(7);
     const [content, setContent] = React.useState("");
     const [isPublic, setIsPublic] = React.useState(true);
     const [containsSpoilers, setContainsSpoilers] = React.useState(false);
-
-    React.useEffect(() => {
-        if (preselectedShow) setSelectedShow(preselectedShow);
-    }, [preselectedShow]);
 
     async function handleSave() {
         if (!selectedShow) {
@@ -89,7 +86,7 @@ function NewReviewForm() {
                 <Label>Show</Label>
                 <ShowPickerCombobox
                     value={selectedShow?.id}
-                    onChange={setSelectedShow}
+                    onChange={setUserSelectedShow}
                     placeholder="Select a show from your list…"
                 />
             </div>

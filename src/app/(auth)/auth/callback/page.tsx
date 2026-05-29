@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 
 export default function CallbackPage() {
+    return (
+        <Suspense fallback={<CallbackSpinner />}>
+            <CallbackHandler />
+        </Suspense>
+    );
+}
+
+function CallbackHandler() {
     const router = useRouter();
     const params = useSearchParams();
     const { login } = useAuth();
@@ -26,6 +34,10 @@ export default function CallbackPage() {
             .catch(() => router.replace("/auth/error?reason=login_failed"));
     }, [login, params, router]);
 
+    return <CallbackSpinner />;
+}
+
+function CallbackSpinner() {
     return (
         <div className="flex flex-col items-center gap-3 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

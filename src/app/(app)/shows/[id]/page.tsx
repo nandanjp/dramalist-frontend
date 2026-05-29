@@ -7,7 +7,7 @@ import { ArrowLeft, Bot, Globe, Loader2, Pencil, Plus, Tv2 } from "lucide-react"
 import { useShow } from "@/hooks/use-shows";
 import { useReviewAggregate, useShowReviews } from "@/hooks/use-reviews";
 import { useShowSummary } from "@/hooks/use-ai";
-import type { Review, Show, ShowSummary } from "@/lib/types";
+import type { Review, ShowSummary } from "@/lib/types";
 import { formatDate } from "@/lib/date";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
