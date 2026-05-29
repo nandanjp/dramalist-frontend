@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,8 +29,10 @@ const schema = z.object({
 });
 type FormValues = z.infer<typeof schema>;
 
-export default function VerifyTotpPage() {
+function VerifyTotpForm() {
     const router = useRouter();
+    const params = useSearchParams();
+    const pendingId = params.get("pending") ?? "";
     const { login } = useAuth();
     const verifyMutation = useTotpVerify();
 
@@ -40,7 +43,7 @@ export default function VerifyTotpPage() {
 
     async function onSubmit(values: FormValues) {
         try {
-            const res = await verifyMutation.mutateAsync(values);
+            const res = await verifyMutation.mutateAsync({ pending_id: pendingId, code: values.code });
             await login(res.access_token, res.expires_in);
             router.push("/dashboard");
         } catch {
@@ -102,5 +105,13 @@ export default function VerifyTotpPage() {
                 </p>
             </CardContent>
         </Card>
+    );
+}
+
+export default function VerifyTotpPage() {
+    return (
+        <Suspense>
+            <VerifyTotpForm />
+        </Suspense>
     );
 }

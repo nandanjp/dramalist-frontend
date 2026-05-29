@@ -11,17 +11,20 @@ export interface LoginRequest {
     password: string;
 }
 
+export interface RegisterRequest {
+    email: string;
+    display_name: string;
+    password: string;
+}
+
 export interface LoginResponse extends TokenResponse {
     require_totp?: boolean;
+    pending_id?: string;
 }
 
 export interface TotpVerifyRequest {
+    pending_id: string;
     code: string;
-}
-
-export interface ChangePasswordRequest {
-    current_password: string;
-    new_password: string;
 }
 
 // ── User ──────────────────────────────────────────────────────────────────────
