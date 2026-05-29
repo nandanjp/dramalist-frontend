@@ -8,13 +8,19 @@ import type {
     ShowSummary,
 } from "@/lib/types";
 
+export interface ShowSummaryInput {
+    showId: string;
+    showTitle?: string;
+    reviews: Array<{ rating: number; content: string }>;
+}
+
 export function useRecommendations() {
     return useMutation({
         mutationFn: (data: RecommendationsRequest) =>
-            apiFetch<AIRecommendation[]>("/api/ai/recommendations", {
+            apiFetch<{ recommendations: AIRecommendation[] }>("/api/ai/recommendations", {
                 method: "POST",
                 body: JSON.stringify(data),
-            }),
+            }).then((res) => res.recommendations ?? []),
     });
 }
 
@@ -30,10 +36,10 @@ export function useMoodSearch() {
 
 export function useShowSummary() {
     return useMutation({
-        mutationFn: (showID: string) =>
-            apiFetch<ShowSummary>(`/api/ai/shows/${showID}/summary`, {
+        mutationFn: ({ showId, showTitle, reviews }: ShowSummaryInput) =>
+            apiFetch<ShowSummary>(`/api/ai/shows/${showId}/summary`, {
                 method: "POST",
-                body: JSON.stringify({}),
+                body: JSON.stringify({ show_title: showTitle ?? "", reviews }),
             }),
     });
 }

@@ -23,9 +23,9 @@ function RecommendationCard({ rec }: { rec: AIRecommendation }) {
             </CardHeader>
             <CardContent className="space-y-3">
                 <p className="text-sm text-muted-foreground">{rec.reason}</p>
-                {rec.genre.length > 0 && (
+                {(rec.genre?.length ?? 0) > 0 && (
                     <div className="flex flex-wrap gap-1">
-                        {rec.genre.map((g) => (
+                        {rec.genre!.map((g) => (
                             <Badge key={g} variant="secondary" className="text-xs">
                                 {g}
                             </Badge>
@@ -50,6 +50,7 @@ export default function RecommendationsPage() {
         mutate({
             genre_breakdown: stats.genre_breakdown,
             avg_rating: stats.avg_rating,
+            total_watched: stats.total_watched,
             recent_shows: recentTitles,
         });
     }

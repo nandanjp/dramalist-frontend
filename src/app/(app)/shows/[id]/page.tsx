@@ -51,10 +51,14 @@ function ReviewItem({ review }: { review: Review }) {
 
 function AISummaryCard({
     showId,
+    showTitle,
     reviewCount,
+    reviews,
 }: {
     showId: string;
+    showTitle: string;
     reviewCount: number;
+    reviews: Array<{ rating: number; content: string | null }>;
 }) {
     const summaryMutation = useShowSummary();
     const result = summaryMutation.data;
@@ -77,9 +81,16 @@ function AISummaryCard({
                     variant="outline"
                     disabled={summaryMutation.isPending || reviewCount === 0}
                     onClick={() =>
-                        summaryMutation.mutate(showId, {
-                            onError: () => toast.error("Failed to generate summary"),
-                        })
+                        summaryMutation.mutate(
+                            {
+                                showId,
+                                showTitle,
+                                reviews: reviews
+                                    .filter((r) => r.content)
+                                    .map((r) => ({ rating: r.rating, content: r.content! })),
+                            },
+                            { onError: () => toast.error("Failed to generate summary") },
+                        )
                     }
                 >
                     {summaryMutation.isPending && (
@@ -267,7 +278,12 @@ export default function ShowDetailPage() {
             </Card>
 
             {/* AI summary */}
-            <AISummaryCard showId={id} reviewCount={aggregate?.review_count ?? 0} />
+            <AISummaryCard
+                showId={id}
+                showTitle={show.title}
+                reviewCount={aggregate?.review_count ?? 0}
+                reviews={reviews}
+            />
 
             {/* Reviews */}
             <section className="space-y-4">

@@ -235,14 +235,15 @@ export interface SearchParams {
 export interface AIRecommendation {
     title: string;
     reason: string;
-    genre: string[];
-    year: number | null;
-    estimated_episodes: number | null;
+    genre?: string[];
+    year?: number | null;
+    estimated_episodes?: number | null;
 }
 
 export interface RecommendationsRequest {
     genre_breakdown: Record<string, number>;
     avg_rating: number | null;
+    total_watched: number;
     recent_shows: string[];
 }
 
