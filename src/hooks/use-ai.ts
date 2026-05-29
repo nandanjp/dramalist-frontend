@@ -11,7 +11,7 @@ import type {
 export function useRecommendations() {
     return useMutation({
         mutationFn: (data: RecommendationsRequest) =>
-            apiFetch<AIRecommendation[]>("/ai/recommendations", {
+            apiFetch<AIRecommendation[]>("/api/ai/recommendations", {
                 method: "POST",
                 body: JSON.stringify(data),
             }),
@@ -21,7 +21,7 @@ export function useRecommendations() {
 export function useMoodSearch() {
     return useMutation({
         mutationFn: (data: MoodSearchRequest) =>
-            apiFetch<MoodSearchResult>("/ai/mood-search", {
+            apiFetch<MoodSearchResult>("/api/ai/mood-search", {
                 method: "POST",
                 body: JSON.stringify(data),
             }),
@@ -31,7 +31,7 @@ export function useMoodSearch() {
 export function useShowSummary() {
     return useMutation({
         mutationFn: (showID: string) =>
-            apiFetch<ShowSummary>(`/ai/shows/${showID}/summary`, {
+            apiFetch<ShowSummary>(`/api/ai/shows/${showID}/summary`, {
                 method: "POST",
                 body: JSON.stringify({}),
             }),

@@ -31,7 +31,7 @@ export function useMyReviews(params: ListParams = {}) {
         queryKey: reviewKeys.mine(params),
         queryFn: () => {
             const qs = buildQS(params);
-            return apiFetch<ReviewListResponse>(`/reviews/me${qs ? `?${qs}` : ""}`);
+            return apiFetch<ReviewListResponse>(`/api/reviews/me${qs ? `?${qs}` : ""}`);
         },
     });
 }
@@ -41,7 +41,7 @@ export function useShowReviews(showID: string, params: ListParams = {}) {
         queryKey: reviewKeys.show(showID, params),
         queryFn: () => {
             const qs = buildQS(params);
-            return apiFetch<ReviewListResponse>(`/reviews/show/${showID}${qs ? `?${qs}` : ""}`);
+            return apiFetch<ReviewListResponse>(`/api/reviews/show/${showID}${qs ? `?${qs}` : ""}`);
         },
         enabled: !!showID,
     });
@@ -50,7 +50,7 @@ export function useShowReviews(showID: string, params: ListParams = {}) {
 export function useReview(id: string) {
     return useQuery({
         queryKey: reviewKeys.detail(id),
-        queryFn: () => apiFetch<Review>(`/reviews/${id}`),
+        queryFn: () => apiFetch<Review>(`/api/reviews/${id}`),
         enabled: !!id,
     });
 }
@@ -58,7 +58,7 @@ export function useReview(id: string) {
 export function useReviewAggregate(showID: string) {
     return useQuery({
         queryKey: reviewKeys.aggregate(showID),
-        queryFn: () => apiFetch<ReviewAggregate>(`/reviews/aggregate/${showID}`),
+        queryFn: () => apiFetch<ReviewAggregate>(`/api/reviews/aggregate/${showID}`),
         enabled: !!showID,
         staleTime: 60 * 1000,
     });
@@ -67,7 +67,7 @@ export function useReviewAggregate(showID: string) {
 export function useRecentPublicReviews() {
     return useQuery({
         queryKey: reviewKeys.publicFeed(),
-        queryFn: () => apiFetch<PublicReviewPreview[]>("/reviews/public/recent"),
+        queryFn: () => apiFetch<PublicReviewPreview[]>("/api/reviews/public/recent"),
         staleTime: 2 * 60 * 1000,
     });
 }
@@ -76,7 +76,7 @@ export function useCreateReview() {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (data: CreateReviewRequest) =>
-            apiFetch<Review>("/reviews", {
+            apiFetch<Review>("/api/reviews", {
                 method: "POST",
                 body: JSON.stringify(data),
             }),
@@ -96,7 +96,7 @@ export function useUpdateReview(id: string) {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (data: UpdateReviewRequest) =>
-            apiFetch<Review>(`/reviews/${id}`, {
+            apiFetch<Review>(`/api/reviews/${id}`, {
                 method: "PATCH",
                 body: JSON.stringify(data),
             }),
@@ -116,7 +116,7 @@ export function useDeleteReview() {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: ({ id, showID }: { id: string; showID: string }) =>
-            apiFetch(`/reviews/${id}`, { method: "DELETE" }).then(() => showID),
+            apiFetch(`/api/reviews/${id}`, { method: "DELETE" }).then(() => showID),
         onSuccess: (showID) => {
             qc.invalidateQueries({ queryKey: reviewKeys.show(showID, {}) });
             qc.invalidateQueries({ queryKey: reviewKeys.aggregate(showID) });

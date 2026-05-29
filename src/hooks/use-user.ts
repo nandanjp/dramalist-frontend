@@ -11,7 +11,7 @@ export const userKeys = {
 export function useMe() {
     return useQuery({
         queryKey: userKeys.me(),
-        queryFn: () => apiFetch<MeResponse>("/users/me"),
+        queryFn: () => apiFetch<MeResponse>("/api/users/me"),
         staleTime: 5 * 60 * 1000,
     });
 }
@@ -19,7 +19,7 @@ export function useMe() {
 export function usePublicProfile(slug: string) {
     return useQuery({
         queryKey: userKeys.profile(slug),
-        queryFn: () => apiFetch<Profile>(`/users/${slug}`),
+        queryFn: () => apiFetch<Profile>(`/api/users/${slug}`),
         enabled: !!slug,
     });
 }
@@ -28,7 +28,7 @@ export function useUpdateProfile() {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (data: UpdateProfileRequest) =>
-            apiFetch<MeResponse>("/users/me", {
+            apiFetch<MeResponse>("/api/users/me", {
                 method: "PATCH",
                 body: JSON.stringify(data),
             }),

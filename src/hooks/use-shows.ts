@@ -27,7 +27,7 @@ export function useShows(params: ListParams = {}) {
         queryKey: showKeys.list(params),
         queryFn: () => {
             const qs = buildQS(params);
-            return apiFetch<ShowListResponse>(`/shows${qs ? `?${qs}` : ""}`);
+            return apiFetch<ShowListResponse>(`/api/shows${qs ? `?${qs}` : ""}`);
         },
         staleTime: 30 * 1000,
     });
@@ -36,7 +36,7 @@ export function useShows(params: ListParams = {}) {
 export function useShow(id: string) {
     return useQuery({
         queryKey: showKeys.detail(id),
-        queryFn: () => apiFetch<Show>(`/shows/${id}`),
+        queryFn: () => apiFetch<Show>(`/api/shows/${id}`),
         enabled: !!id,
     });
 }
@@ -46,7 +46,7 @@ export function usePublicShows(userID: string, params: ListParams = {}) {
         queryKey: showKeys.public(userID, params),
         queryFn: () => {
             const qs = buildQS(params);
-            return apiFetch<ShowListResponse>(`/shows/users/${userID}${qs ? `?${qs}` : ""}`);
+            return apiFetch<ShowListResponse>(`/api/shows/users/${userID}${qs ? `?${qs}` : ""}`);
         },
         enabled: !!userID,
     });
@@ -55,7 +55,7 @@ export function usePublicShows(userID: string, params: ListParams = {}) {
 export function useTrendingShows() {
     return useQuery({
         queryKey: showKeys.trending(),
-        queryFn: () => apiFetch<Show[]>("/shows/public/trending"),
+        queryFn: () => apiFetch<Show[]>("/api/shows/public/trending"),
         staleTime: 5 * 60 * 1000,
     });
 }
@@ -63,7 +63,7 @@ export function useTrendingShows() {
 export function useRecentShows() {
     return useQuery({
         queryKey: showKeys.recent(),
-        queryFn: () => apiFetch<Show[]>("/shows/public/recent"),
+        queryFn: () => apiFetch<Show[]>("/api/shows/public/recent"),
         staleTime: 5 * 60 * 1000,
     });
 }
@@ -72,7 +72,7 @@ export function useCreateShow() {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (data: CreateShowRequest) =>
-            apiFetch<Show>("/shows", {
+            apiFetch<Show>("/api/shows", {
                 method: "POST",
                 body: JSON.stringify(data),
             }),
@@ -86,7 +86,7 @@ export function useUpdateShow(id: string) {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (data: UpdateShowRequest) =>
-            apiFetch<Show>(`/shows/${id}`, {
+            apiFetch<Show>(`/api/shows/${id}`, {
                 method: "PATCH",
                 body: JSON.stringify(data),
             }),
@@ -100,7 +100,7 @@ export function useUpdateShow(id: string) {
 export function useDeleteShow() {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (id: string) => apiFetch(`/shows/${id}`, { method: "DELETE" }),
+        mutationFn: (id: string) => apiFetch(`/api/shows/${id}`, { method: "DELETE" }),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: showKeys.all() });
         },

@@ -17,7 +17,7 @@ export function useSearch(params: SearchParams, enabled = true) {
             if (params.mine) qs.set("mine", "true");
             if (params.page) qs.set("page", String(params.page));
             if (params.limit) qs.set("limit", String(params.limit));
-            return apiFetch<SearchResponse>(`/search?${qs.toString()}`);
+            return apiFetch<SearchResponse>(`/api/search?${qs.toString()}`);
         },
         enabled,
         staleTime: 30 * 1000,
