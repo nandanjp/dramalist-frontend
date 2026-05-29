@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_PATHS = new Set(["/", "/login", "/auth/callback", "/auth/verify-totp", "/auth/error"]);
+const PUBLIC_PATHS = new Set(["/", "/login", "/signup", "/auth/callback", "/auth/verify-totp", "/auth/error"]);
 
 function isPublic(pathname: string): boolean {
     if (PUBLIC_PATHS.has(pathname)) return true;
