@@ -1,15 +1,29 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch, buildQS } from "@/lib/api";
-import type { CreateShowRequest, Show, ShowListResponse, UpdateShowRequest } from "@/lib/types";
+import type {
+    Actor,
+    AddCastMemberRequest,
+    CastMember,
+    CreateShowRequest,
+    Show,
+    ShowListResponse,
+    UpdateCastMemberRequest,
+    UpdateShowRequest,
+} from "@/lib/types";
 
 export const showKeys = {
     all: () => ["shows"] as const,
     list: (params: Record<string, unknown>) => ["shows", "list", params] as const,
     detail: (id: string) => ["shows", "detail", id] as const,
+    cast: (id: string) => ["shows", "cast", id] as const,
     public: (userID: string, params: Record<string, unknown>) =>
         ["shows", "public", userID, params] as const,
     trending: () => ["shows", "trending"] as const,
     recent: () => ["shows", "recent"] as const,
+};
+
+export const actorKeys = {
+    search: (q: string) => ["actors", "search", q] as const,
 };
 
 interface ListParams {
@@ -104,5 +118,75 @@ export function useDeleteShow() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: showKeys.all() });
         },
+    });
+}
+
+// ── Cast hooks ────────────────────────────────────────────────────────────────
+
+export function useCast(showId: string) {
+    return useQuery({
+        queryKey: showKeys.cast(showId),
+        queryFn: () => apiFetch<CastMember[]>(`/api/shows/${showId}/cast`),
+        enabled: !!showId,
+    });
+}
+
+export function useAddCastMember(showId: string) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (data: AddCastMemberRequest) =>
+            apiFetch<CastMember>(`/api/shows/${showId}/cast`, {
+                method: "POST",
+                body: JSON.stringify(data),
+            }),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: showKeys.cast(showId) });
+        },
+    });
+}
+
+export function useUpdateCastMember(showId: string) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ castId, data }: { castId: string; data: UpdateCastMemberRequest }) =>
+            apiFetch(`/api/shows/${showId}/cast/${castId}`, {
+                method: "PATCH",
+                body: JSON.stringify(data),
+            }),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: showKeys.cast(showId) });
+        },
+    });
+}
+
+export function useRemoveCastMember(showId: string) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (castId: string) =>
+            apiFetch(`/api/shows/${showId}/cast/${castId}`, { method: "DELETE" }),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: showKeys.cast(showId) });
+        },
+    });
+}
+
+// ── Actor hooks ───────────────────────────────────────────────────────────────
+
+export function useActorSearch(q: string) {
+    return useQuery({
+        queryKey: actorKeys.search(q),
+        queryFn: () => apiFetch<Actor[]>(`/api/actors?q=${encodeURIComponent(q)}`),
+        enabled: q.length >= 2,
+        staleTime: 60 * 1000,
+    });
+}
+
+export function useCreateActor() {
+    return useMutation({
+        mutationFn: (name: string) =>
+            apiFetch<Actor>("/api/actors", {
+                method: "POST",
+                body: JSON.stringify({ name }),
+            }),
     });
 }

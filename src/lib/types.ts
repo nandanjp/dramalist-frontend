@@ -82,6 +82,8 @@ export interface UpdateProfileRequest {
 // ── Shows ─────────────────────────────────────────────────────────────────────
 
 export type ShowStatus = "watching" | "completed" | "dropped" | "plan_to_watch" | "on_hold";
+export type MediaType = "show" | "movie" | "anime";
+export type CastRole = "main" | "supporting" | "guest";
 
 export const SHOW_STATUSES: ShowStatus[] = [
     "watching",
@@ -90,6 +92,14 @@ export const SHOW_STATUSES: ShowStatus[] = [
     "plan_to_watch",
     "on_hold",
 ];
+
+export const MEDIA_TYPES: MediaType[] = ["show", "movie", "anime"];
+
+export const MEDIA_TYPE_LABELS: Record<MediaType, string> = {
+    show: "Show",
+    movie: "Movie",
+    anime: "Anime",
+};
 
 export const STATUS_LABELS: Record<ShowStatus, string> = {
     watching: "Watching",
@@ -102,12 +112,14 @@ export const STATUS_LABELS: Record<ShowStatus, string> = {
 export interface Show {
     id: string;
     user_id: string;
+    media_type: MediaType;
     title: string;
     original_title: string | null;
     genre: string[];
     status: ShowStatus;
     episode_count: number | null;
     episodes_watched: number;
+    duration_minutes: number | null;
     year: number | null;
     country: string | null;
     language: string | null;
@@ -128,12 +140,14 @@ export interface ShowListResponse {
 }
 
 export interface CreateShowRequest {
+    media_type?: MediaType;
     title: string;
     original_title?: string;
     genre?: string[];
     status: ShowStatus;
     episode_count?: number;
     episodes_watched?: number;
+    duration_minutes?: number;
     year?: number;
     country?: string;
     language?: string;
@@ -145,6 +159,35 @@ export interface CreateShowRequest {
 }
 
 export type UpdateShowRequest = Partial<CreateShowRequest>;
+
+// ── Actors / Cast ─────────────────────────────────────────────────────────────
+
+export interface Actor {
+    id: string;
+    name: string;
+}
+
+export interface CastMember {
+    cast_id: string;
+    actor_id: string;
+    actor_name: string;
+    character_name: string | null;
+    role: CastRole;
+    sort_order: number;
+}
+
+export interface AddCastMemberRequest {
+    actor_id: string;
+    character_name?: string;
+    role?: CastRole;
+    sort_order?: number;
+}
+
+export interface UpdateCastMemberRequest {
+    character_name?: string;
+    role?: CastRole;
+    sort_order?: number;
+}
 
 // ── Reviews ───────────────────────────────────────────────────────────────────
 
@@ -205,6 +248,7 @@ export interface PublicReviewPreview {
 export interface SearchResult {
     show_id: string;
     user_id: string;
+    media_type: MediaType;
     title: string;
     original_title: string;
     genre: string[];

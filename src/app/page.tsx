@@ -1,243 +1,280 @@
 import Link from "next/link";
-import {
-    BookOpen,
-    Brain,
-    List,
-    Search,
-    Sparkles,
-    Star,
-    TrendingUp,
-    Users,
-    Zap,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { BookOpen } from "lucide-react";
+import { DramaMarquee } from "@/components/landing/drama-marquee";
+import { BentoGrid } from "@/components/landing/bento-grid";
+import { MoodDemoSection } from "@/components/landing/mood-demo-section";
 
-export default function LandingPage() {
+// ── Nav ───────────────────────────────────────────────────────────────────────
+
+function Nav() {
     return (
-        <div className="min-h-screen bg-background text-foreground">
-            {/* ── Sticky nav ── */}
-            <header className="fixed top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
-                <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-                    <div className="flex items-center gap-2">
-                        <BookOpen className="h-5 w-5 text-primary" strokeWidth={2} />
-                        <span className="text-lg font-semibold tracking-tight">Dramalist</span>
+        <header className="fixed top-0 z-50 w-full border-b border-slate-200/70 bg-white/80 backdrop-blur-md">
+            <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+                <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900">
+                        <BookOpen className="h-3.5 w-3.5 text-white" strokeWidth={2} />
                     </div>
-                    <div className="flex items-center gap-3">
-                        <Button variant="ghost" size="sm" asChild>
-                            <Link href="/login">Sign in</Link>
-                        </Button>
-                        <Button size="sm" asChild>
-                            <Link href="/signup">Get started</Link>
-                        </Button>
-                    </div>
+                    <span className="text-base font-semibold tracking-tight text-slate-900">Dramalist</span>
                 </div>
-            </header>
-
-            {/* ── Hero ── */}
-            <section className="relative overflow-hidden pt-32 pb-24">
-                {/* Subtle radial glow behind hero text */}
-                <div
-                    className="pointer-events-none absolute inset-0 -z-10"
-                    aria-hidden="true"
-                    style={{
-                        background:
-                            "radial-gradient(ellipse 80% 50% at 50% -10%, hsl(var(--primary) / 0.15), transparent)",
-                    }}
-                />
-
-                <div className="mx-auto max-w-4xl px-4 text-center">
-                    <Badge variant="secondary" className="mb-6 gap-1.5 px-3 py-1 text-xs font-medium">
-                        <Sparkles className="h-3 w-3" />
-                        AI-powered drama discovery
-                    </Badge>
-
-                    <h1 className="text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl lg:text-7xl">
-                        Your drama list,
-                        <br />
-                        <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-                            elevated.
-                        </span>
-                    </h1>
-
-                    <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed">
-                        Track every Asian drama you watch, write rich markdown reviews, and let AI
-                        discover your next obsession — all in one beautifully organized place.
-                    </p>
-
-                    <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                        <Button size="lg" className="px-8 text-base" asChild>
-                            <Link href="/signup">Start for free</Link>
-                        </Button>
-                        <Button size="lg" variant="outline" className="px-8 text-base" asChild>
-                            <Link href="/login">Sign in</Link>
-                        </Button>
-                    </div>
-
-                    {/* Social proof row */}
-                    <div className="mt-14 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
-                        {[
-                            { label: "Shows tracked", value: "10K+" },
-                            { label: "Reviews written", value: "4K+" },
-                            { label: "Genres covered", value: "30+" },
-                        ].map((s) => (
-                            <div key={s.label} className="text-center">
-                                <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                                <p className="text-xs">{s.label}</p>
-                            </div>
-                        ))}
-                    </div>
+                <div className="flex items-center gap-2">
+                    <Link
+                        href="/login"
+                        className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                    >
+                        Sign in
+                    </Link>
+                    <Link
+                        href="/signup"
+                        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+                    >
+                        Get started
+                    </Link>
                 </div>
-            </section>
-
-            {/* ── Feature grid ── */}
-            <section className="border-y border-border/50 bg-muted/20 py-24">
-                <div className="mx-auto max-w-6xl px-4">
-                    <div className="mx-auto mb-14 max-w-2xl text-center">
-                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                            Everything a serious fan needs
-                        </h2>
-                        <p className="mt-4 text-muted-foreground">
-                            Built for people who take their dramas seriously.
-                        </p>
-                    </div>
-
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {FEATURES.map((f) => (
-                            <div
-                                key={f.title}
-                                className="group rounded-xl border border-border/50 bg-card p-6 transition-all hover:border-primary/30 hover:shadow-md"
-                            >
-                                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                    <f.icon className="h-5 w-5" strokeWidth={1.5} />
-                                </div>
-                                <h3 className="mb-2 font-semibold">{f.title}</h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed">
-                                    {f.description}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ── How it works ── */}
-            <section className="py-24">
-                <div className="mx-auto max-w-6xl px-4">
-                    <div className="mx-auto mb-14 max-w-2xl text-center">
-                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                            Up and running in minutes
-                        </h2>
-                        <p className="mt-4 text-muted-foreground">
-                            No spreadsheets. No browser bookmarks. Just your perfect drama list.
-                        </p>
-                    </div>
-
-                    <div className="grid gap-8 sm:grid-cols-3">
-                        {STEPS.map((step, i) => (
-                            <div key={step.title} className="relative text-center">
-                                {i < STEPS.length - 1 && (
-                                    <div
-                                        className="absolute left-1/2 top-5 hidden h-px w-full translate-x-1/2 bg-border sm:block"
-                                        aria-hidden="true"
-                                    />
-                                )}
-                                <div className="relative mx-auto mb-5 flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-background text-sm font-bold text-primary">
-                                    {i + 1}
-                                </div>
-                                <h3 className="mb-2 font-semibold">{step.title}</h3>
-                                <p className="text-sm text-muted-foreground">{step.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ── Final CTA ── */}
-            <section className="border-t border-border/50 bg-muted/20 py-24">
-                <div className="mx-auto max-w-2xl px-4 text-center">
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <Zap className="h-6 w-6" strokeWidth={1.5} />
-                    </div>
-                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                        Ready to build your list?
-                    </h2>
-                    <p className="mt-4 text-muted-foreground">
-                        Join with Google, GitHub, or email. Your first drama takes 30 seconds to add.
-                    </p>
-                    <Button size="lg" className="mt-8 px-10 text-base" asChild>
-                        <Link href="/signup">Create your account</Link>
-                    </Button>
-                </div>
-            </section>
-
-            {/* ── Footer ── */}
-            <footer className="border-t border-border/50 py-8">
-                <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-muted-foreground sm:flex-row">
-                    <div className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4" />
-                        <span className="font-medium text-foreground">Dramalist</span>
-                    </div>
-                    <p>Track the stories that move you.</p>
-                </div>
-            </footer>
-        </div>
+            </div>
+        </header>
     );
 }
 
-const FEATURES = [
-    {
-        icon: List,
-        title: "Track your watchlist",
-        description:
-            "Log every drama with episode progress, status, start/end dates, genres, tags, and personal notes. Never lose track of where you left off.",
-    },
-    {
-        icon: Star,
-        title: "Rich markdown reviews",
-        description:
-            "Write long-form reviews with full CommonMark support — headings, tables, spoiler warnings, and more. Rate from 0 to 10 with precision.",
-    },
-    {
-        icon: Brain,
-        title: "AI recommendations",
-        description:
-            "Get personalized suggestions based on your taste profile and mood. Describe what you're feeling and AI surfaces your next perfect watch.",
-    },
-    {
-        icon: Search,
-        title: "Powerful search",
-        description:
-            "Find any show in your list or across the community instantly. Filter by genre, status, country, year, and tags with fuzzy matching.",
-    },
-    {
-        icon: TrendingUp,
-        title: "Watch statistics",
-        description:
-            "Visualize your habits — total episodes watched, genre breakdown, average rating, and how your taste evolves over time.",
-    },
-    {
-        icon: Users,
-        title: "Public profiles",
-        description:
-            "Share your watchlist and reviews with friends. Follow public profiles to see what others are watching and recommending.",
-    },
-];
+// ── Hero ──────────────────────────────────────────────────────────────────────
+
+function Hero() {
+    return (
+        <section className="relative overflow-hidden bg-white pt-32 pb-0">
+            {/* Subtle radial blobs */}
+            <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 -z-10"
+                style={{
+                    background:
+                        "radial-gradient(ellipse 70% 40% at 20% 60%, #ede9fe 0%, transparent 60%), radial-gradient(ellipse 50% 30% at 80% 20%, #f0e6ff 0%, transparent 60%)",
+                }}
+            />
+
+            <div className="mx-auto max-w-4xl px-4 text-center">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3.5 py-1.5 text-xs font-medium text-violet-700">
+                    <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 3l14 9-14 9V3z" />
+                    </svg>
+                    AI-powered drama discovery
+                </div>
+
+                <h1 className="text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
+                    Track the dramas
+                    <br />
+                    <span
+                        className="bg-clip-text text-transparent"
+                        style={{ backgroundImage: "linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%)" }}
+                    >
+                        that move you.
+                    </span>
+                </h1>
+
+                <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-500">
+                    Your personal cinema log for K-dramas and Asian TV. Rich reviews, AI-powered
+                    recommendations, and a watchlist that actually reflects your taste.
+                </p>
+
+                <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+                    <Link
+                        href="/signup"
+                        className="rounded-xl bg-slate-900 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition-all hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-xl"
+                    >
+                        Start for free
+                    </Link>
+                    <Link
+                        href="/login"
+                        className="rounded-xl border border-slate-300 bg-white px-7 py-3 text-sm font-semibold text-slate-700 transition-all hover:-translate-y-0.5 hover:border-slate-400 hover:shadow-md"
+                    >
+                        Sign in
+                    </Link>
+                </div>
+
+                {/* Stats */}
+                <div className="mt-16 flex flex-wrap items-center justify-center gap-10 border-t border-slate-100 pt-10">
+                    {[
+                        { value: "10K+", label: "Shows tracked" },
+                        { value: "4K+", label: "Reviews written" },
+                        { value: "30+", label: "Genres covered" },
+                    ].map((s) => (
+                        <div key={s.label} className="text-center">
+                            <p className="text-2xl font-bold text-slate-900">{s.value}</p>
+                            <p className="text-xs text-slate-500">{s.label}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Marquee — bleeds into the hero bottom */}
+            <div className="mt-16">
+                <DramaMarquee />
+            </div>
+        </section>
+    );
+}
+
+// ── Bento section ─────────────────────────────────────────────────────────────
+
+function BentoSection() {
+    return (
+        <section className="bg-slate-50 py-28">
+            <div className="mx-auto max-w-6xl px-4">
+                <div className="mx-auto mb-14 max-w-2xl text-center">
+                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                        Everything a serious fan needs
+                    </h2>
+                    <p className="mt-4 text-slate-500">
+                        Built for people who take their dramas seriously.
+                    </p>
+                </div>
+                <BentoGrid />
+            </div>
+        </section>
+    );
+}
+
+// ── How it works ──────────────────────────────────────────────────────────────
 
 const STEPS = [
     {
-        title: "Create your account",
-        description:
-            "Sign up in seconds with Google, GitHub, or email. No credit card required.",
+        num: "01",
+        title: "Add your shows",
+        body: "Log dramas with episode progress, status, genres, tags, and notes. Watching, completed, plan to watch — all tracked.",
+        icon: (
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+        ),
     },
     {
-        title: "Add your first show",
-        description:
-            "Start logging the drama you're watching right now — title, episodes, status, and notes.",
+        num: "02",
+        title: "Write rich reviews",
+        body: "Full markdown support — headings, spoiler warnings, tables. Rate out of 10 with decimal precision. Your thoughts, beautifully formatted.",
+        icon: (
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+        ),
     },
     {
+        num: "03",
         title: "Discover what's next",
-        description:
-            "Get AI recommendations tailored to your genre preferences and viewing history.",
+        body: "Personalized AI recommendations based on your genre breakdown, ratings, and watch history. Or describe a mood and let AI interpret it.",
+        icon: (
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+        ),
     },
 ];
+
+function HowItWorks() {
+    return (
+        <section className="bg-white py-28">
+            <div className="mx-auto max-w-5xl px-4">
+                <div className="mx-auto mb-16 max-w-xl text-center">
+                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                        Up and running in minutes
+                    </h2>
+                    <p className="mt-4 text-slate-500">No spreadsheets. No browser bookmarks. Just your perfect drama log.</p>
+                </div>
+
+                <div className="grid gap-6 sm:grid-cols-3">
+                    {STEPS.map((step) => (
+                        <div
+                            key={step.num}
+                            className="group relative rounded-2xl border border-slate-200 bg-white p-7 transition-shadow hover:shadow-lg"
+                        >
+                            <div className="absolute -top-3 left-6 rounded-md bg-violet-600 px-2.5 py-0.5 text-xs font-bold text-white">
+                                {step.num}
+                            </div>
+                            <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+                                {step.icon}
+                            </div>
+                            <h3 className="mb-2 font-semibold text-slate-900">{step.title}</h3>
+                            <p className="text-sm leading-relaxed text-slate-500">{step.body}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
+
+// ── Final CTA ─────────────────────────────────────────────────────────────────
+
+function FinalCTA() {
+    return (
+        <section className="relative overflow-hidden bg-slate-950 py-28">
+            {/* Glow */}
+            <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                    background:
+                        "radial-gradient(ellipse 60% 50% at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 70%)",
+                }}
+            />
+            <div className="relative mx-auto max-w-2xl px-4 text-center">
+                <p className="mb-4 text-sm font-medium uppercase tracking-widest text-violet-400">
+                    Ready?
+                </p>
+                <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                    Your next favourite drama
+                    <br />
+                    is one click away.
+                </h2>
+                <p className="mt-5 text-slate-400">
+                    Sign up with Google, GitHub, or email. Your first show takes 30 seconds to add.
+                </p>
+                <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+                    <Link
+                        href="/signup"
+                        className="rounded-xl bg-violet-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-900/40 transition-all hover:-translate-y-0.5 hover:bg-violet-500 hover:shadow-xl"
+                    >
+                        Create your account — it&apos;s free
+                    </Link>
+                    <Link
+                        href="/login"
+                        className="rounded-xl border border-slate-700 px-8 py-3.5 text-sm font-semibold text-slate-400 transition-all hover:border-slate-500 hover:text-white"
+                    >
+                        Sign in
+                    </Link>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+
+function Footer() {
+    return (
+        <footer className="border-t border-slate-800 bg-slate-950 py-8">
+            <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-slate-500 sm:flex-row">
+                <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-slate-800">
+                        <BookOpen className="h-3 w-3 text-slate-400" strokeWidth={2} />
+                    </div>
+                    <span className="font-medium text-slate-300">Dramalist</span>
+                </div>
+                <p>Track the stories that move you.</p>
+            </div>
+        </footer>
+    );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
+export default function LandingPage() {
+    return (
+        <div className="min-h-screen">
+            <Nav />
+            <Hero />
+            <BentoSection />
+            <HowItWorks />
+            <MoodDemoSection />
+            <FinalCTA />
+            <Footer />
+        </div>
+    );
+}
