@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { type ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, PenLine, Plus, Trash2 } from "lucide-react";
 import { useMyReviews, useDeleteReview } from "@/hooks/use-reviews";
-import { useShows } from "@/hooks/use-shows";
 import type { Review } from "@/lib/types";
 import { formatDate } from "@/lib/date";
 import { toast } from "sonner";
@@ -34,7 +33,7 @@ function ReviewRowActions({ review }: { review: Review }) {
 
     async function handleDelete() {
         try {
-            await deleteMutation.mutateAsync({ id: review.id, showID: review.show_id });
+            await deleteMutation.mutateAsync({ id: review.id, catalogID: review.catalog_id });
             toast.success("Review deleted");
             setDeleteOpen(false);
         } catch {
@@ -81,28 +80,25 @@ function ReviewRowActions({ review }: { review: Review }) {
     );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// ── Page ─────────────────────────────────────────────────────────────────���────
 
 export default function ReviewsPage() {
     const router = useRouter();
     const { data: reviewsData, isLoading, isError } = useMyReviews();
-    const { data: showsData } = useShows({ limit: 1000 });
-
     const reviews = reviewsData?.reviews ?? [];
-    const showsById = React.useMemo(
-        () => Object.fromEntries((showsData?.shows ?? []).map((s) => [s.id, s])),
-        [showsData?.shows],
-    );
 
     const columns: ColumnDef<Review>[] = [
         {
-            id: "show",
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Show" />,
-            accessorFn: (row) => showsById[row.show_id]?.title ?? row.show_id,
+            id: "title",
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Title" />,
+            accessorFn: (row) => row.catalog_id,
             cell: ({ row }) => (
-                <p className="max-w-[240px] truncate font-medium">
-                    {showsById[row.original.show_id]?.title ?? "—"}
-                </p>
+                <a
+                    href={`/catalog/${row.original.catalog_id}`}
+                    className="max-w-[240px] truncate font-medium hover:underline"
+                >
+                    {row.original.catalog_id}
+                </a>
             ),
         },
         {
@@ -166,8 +162,8 @@ export default function ReviewsPage() {
                     columns={columns}
                     data={reviews}
                     isLoading={isLoading}
-                    filterColumn="show"
-                    filterPlaceholder="Filter by show…"
+                    filterColumn="title"
+                    filterPlaceholder="Filter by title…"
                 />
             </QueryState>
         </div>

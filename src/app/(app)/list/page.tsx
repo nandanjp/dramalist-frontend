@@ -4,8 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { type ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, PenLine, Plus, Trash2 } from "lucide-react";
-import { useShows, useDeleteShow } from "@/hooks/use-shows";
-import type { Show } from "@/lib/types";
+import { useListEntries, useDeleteListEntry } from "@/hooks/use-list";
+import type { UserListEntry } from "@/lib/types";
 import { STATUS_LABELS, SHOW_STATUSES } from "@/lib/types";
 import { formatDistanceToNow } from "@/lib/date";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { QueryState } from "@/components/shared/query-state";
 import { ShowStatusBadge } from "@/components/shows/show-status-badge";
-import { ShowFormDialog } from "@/components/shows/show-form-dialog";
+import { ListEntryDialog } from "@/components/shows/list-entry-dialog";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -34,18 +34,18 @@ import {
 
 // ── Row actions ───────────────────────────────────────────────────────────────
 
-function ShowRowActions({ show }: { show: Show }) {
+function ListRowActions({ entry }: { entry: UserListEntry }) {
     const [editOpen, setEditOpen] = React.useState(false);
     const [deleteOpen, setDeleteOpen] = React.useState(false);
-    const deleteMutation = useDeleteShow();
+    const deleteMutation = useDeleteListEntry();
 
     async function handleDelete() {
         try {
-            await deleteMutation.mutateAsync(show.id);
-            toast.success("Show removed");
+            await deleteMutation.mutateAsync(entry.id);
+            toast.success("Removed from list");
             setDeleteOpen(false);
         } catch {
-            toast.error("Failed to remove show");
+            toast.error("Failed to remove from list");
         }
     }
 
@@ -74,12 +74,12 @@ function ShowRowActions({ show }: { show: Show }) {
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <ShowFormDialog open={editOpen} onOpenChange={setEditOpen} show={show} />
+            <ListEntryDialog open={editOpen} onOpenChange={setEditOpen} entry={entry} />
             <ConfirmDialog
                 open={deleteOpen}
                 onOpenChange={setDeleteOpen}
-                title="Remove show?"
-                description={`"${show.title}" will be permanently removed from your list.`}
+                title="Remove from list?"
+                description={`"${entry.title}" will be removed from your list.`}
                 confirmLabel="Remove"
                 variant="destructive"
                 isPending={deleteMutation.isPending}
@@ -91,14 +91,14 @@ function ShowRowActions({ show }: { show: Show }) {
 
 // ── Columns ───────────────────────────────────────────────────────────────────
 
-const columns: ColumnDef<Show>[] = [
+const columns: ColumnDef<UserListEntry>[] = [
     {
         accessorKey: "title",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Title" />,
         cell: ({ row }) => (
             <div className="max-w-[260px]">
                 <Link
-                    href={`/shows/${row.original.id}`}
+                    href={`/catalog/${row.original.catalog_id}`}
                     className="truncate font-medium hover:underline"
                 >
                     {row.original.title}
@@ -155,7 +155,7 @@ const columns: ColumnDef<Show>[] = [
     },
     {
         id: "actions",
-        cell: ({ row }) => <ShowRowActions show={row.original} />,
+        cell: ({ row }) => <ListRowActions entry={row.original} />,
         size: 56,
     },
 ];
@@ -167,18 +167,18 @@ export default function ListPage() {
     const [statusFilter, setStatusFilter] = React.useState<string>("all");
 
     const params = statusFilter !== "all" ? { status: statusFilter } : {};
-    const { data, isLoading, isError } = useShows(params);
-    const shows = data?.shows ?? [];
+    const { data, isLoading, isError } = useListEntries(params);
+    const entries = data?.entries ?? [];
 
     return (
         <div className="space-y-6">
             <PageHeader
                 title="My List"
-                description="All the shows you're tracking."
+                description="All the titles you're tracking."
                 actions={
                     <Button onClick={() => setAddOpen(true)}>
                         <Plus className="mr-2 h-4 w-4" />
-                        Add show
+                        Add to list
                     </Button>
                 }
             />
@@ -186,10 +186,10 @@ export default function ListPage() {
             <QueryState isLoading={false} isError={isError} isEmpty={false}>
                 <DataTable
                     columns={columns}
-                    data={shows}
+                    data={entries}
                     isLoading={isLoading}
                     filterColumn="title"
-                    filterPlaceholder="Search shows…"
+                    filterPlaceholder="Search list…"
                     toolbarExtra={
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
                             <SelectTrigger className="h-8 w-36">
@@ -208,7 +208,7 @@ export default function ListPage() {
                 />
             </QueryState>
 
-            <ShowFormDialog open={addOpen} onOpenChange={setAddOpen} />
+            <ListEntryDialog open={addOpen} onOpenChange={setAddOpen} />
         </div>
     );
 }

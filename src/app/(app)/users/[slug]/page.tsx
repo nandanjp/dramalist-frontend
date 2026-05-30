@@ -4,7 +4,7 @@ import * as React from "react";
 import { useParams } from "next/navigation";
 import { BookOpen, CalendarDays } from "lucide-react";
 import { usePublicProfile } from "@/hooks/use-user";
-import { usePublicShows } from "@/hooks/use-shows";
+import { usePublicList } from "@/hooks/use-list";
 import { SHOW_STATUSES, STATUS_LABELS } from "@/lib/types";
 import { formatDate } from "@/lib/date";
 import { getInitials } from "@/lib/utils";
@@ -29,13 +29,13 @@ export default function PublicProfilePage() {
     const { data: profile, isLoading: profileLoading, isError: profileError } =
         usePublicProfile(slug);
 
-    const showParams = statusFilter !== "all" ? { status: statusFilter } : {};
-    const { data: showsData, isLoading: showsLoading } = usePublicShows(
+    const listParams = statusFilter !== "all" ? { status: statusFilter } : {};
+    const { data: listData, isLoading: listLoading } = usePublicList(
         profile?.id ?? "",
-        showParams,
+        listParams,
     );
 
-    const shows = showsData?.shows ?? [];
+    const entries = listData?.entries ?? [];
 
     if (profileLoading) {
         return (
@@ -91,11 +91,11 @@ export default function PublicProfilePage() {
                                 <CalendarDays className="h-3.5 w-3.5" />
                                 Member since {formatDate(profile.created_at)}
                             </span>
-                            {showsData != null && (
+                            {listData != null && (
                                 <span className="flex items-center gap-1">
                                     <BookOpen className="h-3.5 w-3.5" />
-                                    {showsData.total} public show
-                                    {showsData.total !== 1 ? "s" : ""}
+                                    {listData.total} public title
+                                    {listData.total !== 1 ? "s" : ""}
                                 </span>
                             )}
                         </div>
@@ -103,10 +103,10 @@ export default function PublicProfilePage() {
                 </CardContent>
             </Card>
 
-            {/* Shows */}
+            {/* List */}
             <section className="space-y-4">
                 <div className="flex items-center justify-between gap-4">
-                    <h2 className="text-lg font-semibold">Shows</h2>
+                    <h2 className="text-lg font-semibold">List</h2>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                         <SelectTrigger className="w-40">
                             <SelectValue />
@@ -122,16 +122,16 @@ export default function PublicProfilePage() {
                     </Select>
                 </div>
 
-                {showsLoading ? (
+                {listLoading ? (
                     <CardGridSkeleton />
-                ) : shows.length === 0 ? (
+                ) : entries.length === 0 ? (
                     <p className="py-16 text-center text-sm text-muted-foreground">
-                        No public shows yet.
+                        No public titles yet.
                     </p>
                 ) : (
                     <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                        {shows.map((show) => (
-                            <ShowCard key={show.id} show={show} variant="public" />
+                        {entries.map((entry) => (
+                            <ShowCard key={entry.id} entry={entry} variant="public" />
                         ))}
                     </div>
                 )}

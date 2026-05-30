@@ -2,7 +2,7 @@
 
 import { Sparkles } from "lucide-react";
 import { useMe } from "@/hooks/use-user";
-import { useShows } from "@/hooks/use-shows";
+import { useListEntries } from "@/hooks/use-list";
 import { useRecommendations } from "@/hooks/use-ai";
 import type { AIRecommendation } from "@/lib/types";
 import { PageHeader } from "@/components/shared/page-header";
@@ -39,11 +39,11 @@ function RecommendationCard({ rec }: { rec: AIRecommendation }) {
 
 export default function RecommendationsPage() {
     const { data: me } = useMe();
-    const { data: showsData } = useShows({ limit: 5, sort: "updated_at" });
+    const { data: listData } = useListEntries({ limit: 5, sort: "updated_at" });
     const { mutate, data: recommendations, isPending } = useRecommendations();
 
     const stats = me?.watch_stats;
-    const recentTitles = (showsData?.shows ?? []).map((s) => s.title);
+    const recentTitles = (listData?.entries ?? []).map((e) => e.title);
 
     function handleGenerate() {
         if (!stats) return;

@@ -79,10 +79,11 @@ export interface UpdateProfileRequest {
     };
 }
 
-// ── Shows ─────────────────────────────────────────────────────────────────────
+// ── Shows / Status ────────────────────────────────────────────────────────────
 
 export type ShowStatus = "watching" | "completed" | "dropped" | "plan_to_watch" | "on_hold";
 export type MediaType = "show" | "movie" | "anime";
+export type AiringStatus = "ongoing" | "completed" | "upcoming";
 export type CastRole = "main" | "supporting" | "guest";
 
 export const SHOW_STATUSES: ShowStatus[] = [
@@ -109,20 +110,45 @@ export const STATUS_LABELS: Record<ShowStatus, string> = {
     on_hold: "On Hold",
 };
 
-export interface Show {
+// ── Catalog ───────────────────────────────────────────────────────────────────
+
+export interface CatalogEntry {
     id: string;
-    user_id: string;
     media_type: MediaType;
     title: string;
     original_title: string | null;
-    genre: string[];
-    status: ShowStatus;
-    episode_count: number | null;
-    episodes_watched: number;
-    duration_minutes: number | null;
+    synopsis: string | null;
+    poster_url: string | null;
     year: number | null;
     country: string | null;
     language: string | null;
+    episode_count: number | null;
+    duration_minutes: number | null;
+    genre: string[];
+    airing_status: AiringStatus;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface CatalogDetail extends CatalogEntry {
+    cast: CastMember[];
+}
+
+export interface CatalogListResponse {
+    results: CatalogEntry[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
+// ── User List ─────────────────────────────────────────────────────────────────
+
+export interface UserListEntry {
+    id: string;
+    user_id: string;
+    catalog_id: string;
+    status: ShowStatus;
+    episodes_watched: number;
     notes: string | null;
     tags: string[];
     is_public: boolean;
@@ -130,27 +156,30 @@ export interface Show {
     completed_at: string | null;
     created_at: string;
     updated_at: string;
+    // Denormalized from catalog join
+    title: string;
+    original_title: string | null;
+    media_type: MediaType;
+    genre: string[];
+    year: number | null;
+    country: string | null;
+    language: string | null;
+    episode_count: number | null;
+    airing_status: AiringStatus;
+    poster_url: string | null;
 }
 
-export interface ShowListResponse {
-    shows: Show[];
+export interface UserListResponse {
+    entries: UserListEntry[];
     total: number;
     page: number;
     limit: number;
 }
 
-export interface CreateShowRequest {
-    media_type?: MediaType;
-    title: string;
-    original_title?: string;
-    genre?: string[];
+export interface AddToListRequest {
+    catalog_id: string;
     status: ShowStatus;
-    episode_count?: number;
     episodes_watched?: number;
-    duration_minutes?: number;
-    year?: number;
-    country?: string;
-    language?: string;
     notes?: string;
     tags?: string[];
     is_public?: boolean;
@@ -158,7 +187,7 @@ export interface CreateShowRequest {
     completed_at?: string;
 }
 
-export type UpdateShowRequest = Partial<CreateShowRequest>;
+export type UpdateListEntryRequest = Partial<Omit<AddToListRequest, "catalog_id">>;
 
 // ── Actors / Cast ─────────────────────────────────────────────────────────────
 
@@ -193,7 +222,7 @@ export interface UpdateCastMemberRequest {
 
 export interface Review {
     id: string;
-    show_id: string;
+    catalog_id: string;
     user_id: string;
     rating: number;
     content: string | null;
@@ -205,7 +234,7 @@ export interface Review {
 }
 
 export interface ReviewAggregate {
-    show_id: string;
+    catalog_id: string;
     avg_rating: number | null;
     review_count: number;
 }
@@ -218,7 +247,7 @@ export interface ReviewListResponse {
 }
 
 export interface CreateReviewRequest {
-    show_id: string;
+    catalog_id: string;
     rating: number;
     content?: string;
     contains_spoilers?: boolean;
@@ -236,7 +265,7 @@ export interface UpdateReviewRequest {
 
 export interface PublicReviewPreview {
     id: string;
-    show_id: string;
+    catalog_id: string;
     user_id: string;
     rating: number;
     content_snippet: string | null;
@@ -246,16 +275,17 @@ export interface PublicReviewPreview {
 // ── Search ────────────────────────────────────────────────────────────────────
 
 export interface SearchResult {
-    show_id: string;
-    user_id: string;
+    catalog_id: string;
     media_type: MediaType;
     title: string;
-    original_title: string;
+    original_title: string | null;
+    synopsis: string | null;
     genre: string[];
-    status: ShowStatus;
-    tags: string[];
+    airing_status: AiringStatus;
     year: number | null;
-    is_public: boolean;
+    country: string | null;
+    language: string | null;
+    poster_url: string | null;
 }
 
 export interface SearchResponse {
@@ -267,9 +297,13 @@ export interface SearchResponse {
 
 export interface SearchParams {
     q?: string;
-    status?: ShowStatus;
+    media_type?: MediaType;
     genre?: string;
-    mine?: boolean;
+    year_from?: number;
+    year_to?: number;
+    country?: string;
+    language?: string;
+    airing_status?: AiringStatus;
     page?: number;
     limit?: number;
 }

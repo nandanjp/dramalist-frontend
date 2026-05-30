@@ -12,10 +12,10 @@ import type {
 export const reviewKeys = {
     all: () => ["reviews"] as const,
     mine: (params: Record<string, unknown>) => ["reviews", "mine", params] as const,
-    show: (showID: string, params: Record<string, unknown>) =>
-        ["reviews", "show", showID, params] as const,
+    catalog: (catalogID: string, params: Record<string, unknown>) =>
+        ["reviews", "catalog", catalogID, params] as const,
     detail: (id: string) => ["reviews", "detail", id] as const,
-    aggregate: (showID: string) => ["reviews", "aggregate", showID] as const,
+    aggregate: (catalogID: string) => ["reviews", "aggregate", catalogID] as const,
     publicFeed: () => ["reviews", "public", "recent"] as const,
 };
 
@@ -36,14 +36,14 @@ export function useMyReviews(params: ListParams = {}) {
     });
 }
 
-export function useShowReviews(showID: string, params: ListParams = {}) {
+export function useCatalogReviews(catalogID: string, params: ListParams = {}) {
     return useQuery({
-        queryKey: reviewKeys.show(showID, params),
+        queryKey: reviewKeys.catalog(catalogID, params),
         queryFn: () => {
             const qs = buildQS(params);
-            return apiFetch<ReviewListResponse>(`/api/reviews/show/${showID}${qs ? `?${qs}` : ""}`);
+            return apiFetch<ReviewListResponse>(`/api/reviews/catalog/${catalogID}${qs ? `?${qs}` : ""}`);
         },
-        enabled: !!showID,
+        enabled: !!catalogID,
     });
 }
 
@@ -55,11 +55,11 @@ export function useReview(id: string) {
     });
 }
 
-export function useReviewAggregate(showID: string) {
+export function useReviewAggregate(catalogID: string) {
     return useQuery({
-        queryKey: reviewKeys.aggregate(showID),
-        queryFn: () => apiFetch<ReviewAggregate>(`/api/reviews/aggregate/${showID}`),
-        enabled: !!showID,
+        queryKey: reviewKeys.aggregate(catalogID),
+        queryFn: () => apiFetch<ReviewAggregate>(`/api/reviews/aggregate/${catalogID}`),
+        enabled: !!catalogID,
         staleTime: 60 * 1000,
     });
 }
@@ -82,10 +82,10 @@ export function useCreateReview() {
             }),
         onSuccess: (data) => {
             qc.invalidateQueries({
-                queryKey: reviewKeys.show(data.show_id, {}),
+                queryKey: reviewKeys.catalog(data.catalog_id, {}),
             });
             qc.invalidateQueries({
-                queryKey: reviewKeys.aggregate(data.show_id),
+                queryKey: reviewKeys.aggregate(data.catalog_id),
             });
             qc.invalidateQueries({ queryKey: reviewKeys.mine({}) });
         },
@@ -103,10 +103,10 @@ export function useUpdateReview(id: string) {
         onSuccess: (data) => {
             qc.setQueryData(reviewKeys.detail(id), data);
             qc.invalidateQueries({
-                queryKey: reviewKeys.show(data.show_id, {}),
+                queryKey: reviewKeys.catalog(data.catalog_id, {}),
             });
             qc.invalidateQueries({
-                queryKey: reviewKeys.aggregate(data.show_id),
+                queryKey: reviewKeys.aggregate(data.catalog_id),
             });
         },
     });
@@ -115,11 +115,11 @@ export function useUpdateReview(id: string) {
 export function useDeleteReview() {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, showID }: { id: string; showID: string }) =>
-            apiFetch(`/api/reviews/${id}`, { method: "DELETE" }).then(() => showID),
-        onSuccess: (showID) => {
-            qc.invalidateQueries({ queryKey: reviewKeys.show(showID, {}) });
-            qc.invalidateQueries({ queryKey: reviewKeys.aggregate(showID) });
+        mutationFn: ({ id, catalogID }: { id: string; catalogID: string }) =>
+            apiFetch(`/api/reviews/${id}`, { method: "DELETE" }).then(() => catalogID),
+        onSuccess: (catalogID) => {
+            qc.invalidateQueries({ queryKey: reviewKeys.catalog(catalogID, {}) });
+            qc.invalidateQueries({ queryKey: reviewKeys.aggregate(catalogID) });
             qc.invalidateQueries({ queryKey: reviewKeys.mine({}) });
         },
     });

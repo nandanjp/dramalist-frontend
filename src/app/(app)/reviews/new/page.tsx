@@ -5,12 +5,11 @@ import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useCreateReview } from "@/hooks/use-reviews";
-import { useShows } from "@/hooks/use-shows";
-import type { Show } from "@/lib/types";
+import type { SearchResult } from "@/lib/types";
 import { toast } from "sonner";
 import { ReviewEditor } from "@/components/reviews/review-editor";
 import { RatingInput } from "@/components/reviews/rating-stars";
-import { ShowPickerCombobox } from "@/components/shows/show-picker-combobox";
+import { CatalogPickerCombobox } from "@/components/shows/catalog-picker-combobox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -27,36 +26,30 @@ export default function NewReviewPage() {
 function NewReviewForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const preselectedShowId = searchParams.get("showId");
+    const preselectedCatalogId = searchParams.get("catalogId");
     const createMutation = useCreateReview();
 
-    const { data: showsData } = useShows({ limit: 100 });
-    const preselectedShow = React.useMemo(
-        () => showsData?.shows.find((s) => s.id === preselectedShowId),
-        [showsData, preselectedShowId],
-    );
-
-    const [userSelectedShow, setUserSelectedShow] = React.useState<Show | undefined>();
-    const selectedShow = userSelectedShow ?? preselectedShow;
+    const [selectedCatalog, setSelectedCatalog] = React.useState<SearchResult | undefined>();
     const [rating, setRating] = React.useState(7);
     const [content, setContent] = React.useState("");
     const [isPublic, setIsPublic] = React.useState(true);
     const [containsSpoilers, setContainsSpoilers] = React.useState(false);
 
+    const effectiveCatalogId = selectedCatalog?.catalog_id ?? preselectedCatalogId ?? "";
+
     async function handleSave() {
-        if (!selectedShow) {
-            toast.error("Please select a show first");
+        if (!effectiveCatalogId) {
+            toast.error("Please select a title first");
             return;
         }
         try {
             await createMutation.mutateAsync({
-                show_id: selectedShow.id,
+                catalog_id: effectiveCatalogId,
                 rating,
                 content: content || undefined,
                 is_public: isPublic,
                 contains_spoilers: containsSpoilers,
-                show_genres: selectedShow.genre,
-                show_episode_count: selectedShow.episode_count ?? undefined,
+                show_genres: selectedCatalog?.genre,
             });
             toast.success("Review saved");
             router.push("/reviews");
@@ -73,7 +66,10 @@ function NewReviewForm() {
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back
                 </Button>
-                <Button onClick={handleSave} disabled={createMutation.isPending || !selectedShow}>
+                <Button
+                    onClick={handleSave}
+                    disabled={createMutation.isPending || !effectiveCatalogId}
+                >
                     {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Save review
                 </Button>
@@ -81,15 +77,17 @@ function NewReviewForm() {
 
             <Separator />
 
-            {/* Show picker */}
-            <div className="space-y-2">
-                <Label>Show</Label>
-                <ShowPickerCombobox
-                    value={selectedShow?.id}
-                    onChange={setUserSelectedShow}
-                    placeholder="Select a show from your list…"
-                />
-            </div>
+            {/* Catalog picker */}
+            {!preselectedCatalogId && (
+                <div className="space-y-2">
+                    <Label>Title</Label>
+                    <CatalogPickerCombobox
+                        value={selectedCatalog?.catalog_id}
+                        onChange={setSelectedCatalog}
+                        placeholder="Search the catalog…"
+                    />
+                </div>
+            )}
 
             {/* Rating */}
             <div className="space-y-2">

@@ -53,8 +53,12 @@ export default function LoginPage() {
             }
             await login(res.access_token, res.expires_in);
             router.push("/dashboard");
-        } catch {
-            form.setError("root", { message: "Invalid email or password" });
+        } catch (err) {
+            const message =
+                err instanceof Error && err.message !== "Unauthorized"
+                    ? err.message
+                    : "Invalid email or password";
+            form.setError("root", { message });
         }
     }
 

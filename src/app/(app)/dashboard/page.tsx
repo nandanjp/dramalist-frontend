@@ -2,12 +2,12 @@
 
 import { BookOpen, Star, Tv2, TrendingUp } from "lucide-react";
 import { useMe } from "@/hooks/use-user";
-import { useTrendingShows, useRecentShows } from "@/hooks/use-shows";
+import { useTrendingCatalog, useRecentCatalog } from "@/hooks/use-catalog";
 import { useRecentPublicReviews } from "@/hooks/use-reviews";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/shared/page-header";
 import { QueryState } from "@/components/shared/query-state";
-import { ShowCard } from "@/components/shows/show-card";
+import { CatalogCard } from "@/components/shows/catalog-card";
 import { ReviewPreviewCard } from "@/components/reviews/review-card";
 
 // ── Stats card ────────────────────────────────────────────────────────────────
@@ -42,8 +42,8 @@ export default function DashboardPage() {
         data: trending,
         isLoading: trendingLoading,
         isError: trendingError,
-    } = useTrendingShows();
-    const { data: recent, isLoading: recentLoading, isError: recentError } = useRecentShows();
+    } = useTrendingCatalog();
+    const { data: recent, isLoading: recentLoading, isError: recentError } = useRecentCatalog();
     const {
         data: reviews,
         isLoading: reviewsLoading,
@@ -86,18 +86,18 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            {/* Trending shows */}
+            {/* Trending */}
             <section className="space-y-4">
                 <h2 className="text-lg font-semibold">Trending</h2>
                 <QueryState
                     isLoading={trendingLoading}
                     isError={trendingError}
                     isEmpty={!trending?.length}
-                    empty={{ title: "No trending shows yet" }}
+                    empty={{ title: "No trending titles yet" }}
                 >
                     <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                        {trending?.map((show) => (
-                            <ShowCard key={show.id} show={show} variant="public" />
+                        {trending?.map((entry) => (
+                            <CatalogCard key={entry.id} entry={entry} />
                         ))}
                     </div>
                 </QueryState>
@@ -113,8 +113,8 @@ export default function DashboardPage() {
                     empty={{ title: "Nothing recently added" }}
                 >
                     <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                        {recent?.slice(0, 4).map((show) => (
-                            <ShowCard key={show.id} show={show} variant="public" />
+                        {recent?.slice(0, 4).map((entry) => (
+                            <CatalogCard key={entry.id} entry={entry} />
                         ))}
                     </div>
                 </QueryState>

@@ -1,14 +1,13 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { Search } from "lucide-react";
 import { useSearch } from "@/hooks/use-search";
 import { useDebounce } from "@/hooks/use-debounce";
-import type { SearchResult } from "@/lib/types";
-import { SHOW_STATUSES, STATUS_LABELS } from "@/lib/types";
+import type { MediaType, SearchResult } from "@/lib/types";
+import { MEDIA_TYPES, MEDIA_TYPE_LABELS } from "@/lib/types";
 import { PageHeader } from "@/components/shared/page-header";
-import { ShowFormDialog } from "@/components/shows/show-form-dialog";
-import { ShowStatusBadge } from "@/components/shows/show-status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,32 +21,33 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-// ── Result card ───────────────────────────────────────────────────────────────
-
-function SearchResultCard({
-    result,
-    onAdd,
-}: {
-    result: SearchResult;
-    onAdd: (result: SearchResult) => void;
-}) {
+function SearchResultCard({ result }: { result: SearchResult }) {
     return (
-        <Card>
+        <Card className="flex flex-col">
             <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="line-clamp-2 text-base">{result.title}</CardTitle>
-                    <ShowStatusBadge status={result.status} />
+                    <CardTitle className="line-clamp-2 text-base">
+                        <Link href={`/catalog/${result.catalog_id}`} className="hover:underline">
+                            {result.title}
+                        </Link>
+                    </CardTitle>
+                    <Badge variant="outline" className="shrink-0 text-xs capitalize">
+                        {result.media_type}
+                    </Badge>
                 </div>
                 {result.original_title && (
-                    <p className="truncate text-xs text-muted-foreground">
-                        {result.original_title}
-                    </p>
+                    <p className="truncate text-xs text-muted-foreground">{result.original_title}</p>
                 )}
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="flex flex-1 flex-col justify-between space-y-3">
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     {result.year && <span>{result.year}</span>}
+                    {result.country && <span>{result.country}</span>}
+                    <span className="capitalize">{result.airing_status}</span>
                 </div>
+                {result.synopsis && (
+                    <p className="line-clamp-2 text-xs text-muted-foreground">{result.synopsis}</p>
+                )}
                 {result.genre.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                         {result.genre.slice(0, 3).map((g) => (
@@ -57,25 +57,17 @@ function SearchResultCard({
                         ))}
                     </div>
                 )}
-                <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => onAdd(result)}
-                >
-                    Add to my list
+                <Button size="sm" variant="outline" className="w-full" asChild>
+                    <Link href={`/catalog/${result.catalog_id}`}>View details</Link>
                 </Button>
             </CardContent>
         </Card>
     );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
-
 export default function SearchPage() {
     const [query, setQuery] = React.useState("");
-    const [statusFilter, setStatusFilter] = React.useState("all");
-    const [addTarget, setAddTarget] = React.useState<SearchResult | null>(null);
+    const [mediaType, setMediaType] = React.useState<MediaType | "all">("all");
 
     const debouncedQuery = useDebounce(query, 400);
     const enabled = debouncedQuery.length >= 1;
@@ -83,7 +75,7 @@ export default function SearchPage() {
     const { data, isLoading } = useSearch(
         {
             q: debouncedQuery || undefined,
-            status: statusFilter !== "all" ? (statusFilter as SearchResult["status"]) : undefined,
+            media_type: mediaType !== "all" ? mediaType : undefined,
             limit: 24,
         },
         enabled,
@@ -93,38 +85,39 @@ export default function SearchPage() {
 
     return (
         <div className="space-y-6">
-            <PageHeader title="Search" description="Find dramas across all public lists." />
+            <PageHeader title="Search" description="Browse the drama catalog." />
 
-            {/* Filters */}
             <div className="flex flex-wrap gap-3">
                 <div className="relative min-w-[200px] flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
-                        placeholder="Search by title, genre, tag…"
+                        placeholder="Search by title, genre, synopsis…"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         className="pl-9"
                     />
                 </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-40">
+                <Select
+                    value={mediaType}
+                    onValueChange={(v) => setMediaType(v as MediaType | "all")}
+                >
+                    <SelectTrigger className="w-36">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All statuses</SelectItem>
-                        {SHOW_STATUSES.map((s) => (
-                            <SelectItem key={s} value={s}>
-                                {STATUS_LABELS[s]}
+                        <SelectItem value="all">All types</SelectItem>
+                        {MEDIA_TYPES.map((t) => (
+                            <SelectItem key={t} value={t}>
+                                {MEDIA_TYPE_LABELS[t]}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
             </div>
 
-            {/* Results */}
             {!enabled ? (
                 <p className="py-16 text-center text-sm text-muted-foreground">
-                    Type to search across public drama lists.
+                    Type to search the catalog.
                 </p>
             ) : isLoading ? (
                 <CardGridSkeleton count={8} cols="4" />
@@ -134,47 +127,13 @@ export default function SearchPage() {
                 </p>
             ) : (
                 <>
-                    <p className="text-sm text-muted-foreground">
-                        {data?.total ?? results.length} results
-                    </p>
+                    <p className="text-sm text-muted-foreground">{data?.total ?? results.length} results</p>
                     <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                         {results.map((r) => (
-                            <SearchResultCard key={r.show_id} result={r} onAdd={setAddTarget} />
+                            <SearchResultCard key={r.catalog_id} result={r} />
                         ))}
                     </div>
                 </>
-            )}
-
-            {/* Pre-filled add dialog */}
-            {addTarget && (
-                <ShowFormDialog
-                    open={!!addTarget}
-                    onOpenChange={(open) => {
-                        if (!open) setAddTarget(null);
-                    }}
-                    show={{
-                        id: "",
-                        user_id: "",
-                        media_type: "show",
-                        title: addTarget.title,
-                        original_title: addTarget.original_title || null,
-                        genre: addTarget.genre,
-                        status: "plan_to_watch",
-                        episode_count: null,
-                        episodes_watched: 0,
-                        duration_minutes: null,
-                        year: addTarget.year,
-                        country: null,
-                        language: null,
-                        notes: null,
-                        tags: addTarget.tags,
-                        is_public: false,
-                        started_at: null,
-                        completed_at: null,
-                        created_at: "",
-                        updated_at: "",
-                    }}
-                />
             )}
         </div>
     );

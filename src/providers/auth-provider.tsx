@@ -36,9 +36,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         async (token: string, expiresIn = 900) => {
             setToken(token);
             setExpiresAt(Date.now() + expiresIn * 1000);
-            await fetchAndSetUser();
+            // Fetch user profile — throws on failure so callers can show an error.
+            const data = await apiFetch<MeResponse>("/api/users/me");
+            setUser(data.profile);
         },
-        [fetchAndSetUser],
+        [],
     );
 
     const logout = useCallback(async () => {
