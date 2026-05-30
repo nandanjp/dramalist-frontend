@@ -65,7 +65,9 @@ export async function apiFetch<T = unknown>(path: string, init: RequestInit = {}
     });
 
     // On 401, attempt one token refresh then retry.
-    if (res.status === 401) {
+    // Skip for auth endpoints — they're unauthenticated; a 401 is a credential failure, not an expired token.
+    const isAuthPath = path.startsWith("/auth/");
+    if (res.status === 401 && !isAuthPath) {
         const result = await refreshToken();
         if (!result) {
             if (typeof window !== "undefined") window.location.href = "/login";
