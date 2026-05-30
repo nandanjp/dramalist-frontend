@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { apiFetch, refreshToken, setToken } from "@/lib/api";
 import type { MeResponse, Profile } from "@/lib/types";
 
@@ -22,15 +23,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Tracks when the current access token expires; drives the refresh timer.
     const [expiresAt, setExpiresAt] = useState<number | null>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const qc = useQueryClient();
 
     const fetchAndSetUser = useCallback(async () => {
         try {
             const data = await apiFetch<MeResponse>("/api/users/me");
             setUser(data.profile);
+            // Prefill React Query cache so useMe() callers skip a redundant network request.
+            qc.setQueryData(["user", "me"], data);
         } catch {
             setUser(null);
         }
-    }, []);
+    }, [qc]);
 
     const login = useCallback(
         async (token: string, expiresIn = 900) => {
@@ -39,8 +43,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Fetch user profile — throws on failure so callers can show an error.
             const data = await apiFetch<MeResponse>("/api/users/me");
             setUser(data.profile);
+            qc.setQueryData(["user", "me"], data);
         },
-        [],
+        [qc],
     );
 
     const logout = useCallback(async () => {
