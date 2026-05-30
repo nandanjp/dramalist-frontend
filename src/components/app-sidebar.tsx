@@ -18,6 +18,7 @@ import {
 import { useAuth } from "@/providers/auth-provider";
 import { getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -66,7 +67,7 @@ const NAV_GROUPS = [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const pathname = usePathname();
     const router = useRouter();
-    const { user, logout } = useAuth();
+    const { user, logout, isLoading } = useAuth();
 
     async function handleLogout() {
         await logout();
@@ -142,12 +143,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <span className="truncate font-semibold">
-                                            {user?.display_name ?? "User"}
-                                        </span>
-                                        <span className="truncate text-xs text-muted-foreground">
-                                            {user?.email}
-                                        </span>
+                                        {isLoading ? (
+                                            <>
+                                                <Skeleton className="h-3.5 w-24" />
+                                                <Skeleton className="mt-1 h-3 w-32" />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="truncate font-semibold">
+                                                    {user?.display_name ?? "User"}
+                                                </span>
+                                                <span className="truncate text-xs text-muted-foreground">
+                                                    {user?.email}
+                                                </span>
+                                            </>
+                                        )}
                                     </div>
                                     <ChevronsUpDown className="ml-auto size-4" />
                                 </SidebarMenuButton>
@@ -170,10 +180,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="grid flex-1 text-left text-sm leading-tight">
-                                            <span className="truncate font-semibold">
-                                                {user?.display_name ?? "User"}
-                                            </span>
-                                            <span className="truncate text-xs">{user?.email}</span>
+                                            {isLoading ? (
+                                                <>
+                                                    <Skeleton className="h-3.5 w-24" />
+                                                    <Skeleton className="mt-1 h-3 w-32" />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className="truncate font-semibold">
+                                                        {user?.display_name ?? "User"}
+                                                    </span>
+                                                    <span className="truncate text-xs">{user?.email}</span>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 </DropdownMenuLabel>

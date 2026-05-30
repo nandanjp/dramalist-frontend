@@ -287,13 +287,15 @@ export default function CatalogDetailPage() {
                 </CardContent>
             </Card>
 
-            {/* AI summary */}
-            <AISummaryCard
-                catalogId={id}
-                showTitle={catalog.title}
-                reviewCount={aggregate?.review_count ?? 0}
-                reviews={reviews}
-            />
+            {/* AI summary — shown only after reviews have loaded */}
+            {!reviewsLoading && (
+                <AISummaryCard
+                    catalogId={id}
+                    showTitle={catalog.title}
+                    reviewCount={aggregate?.review_count ?? 0}
+                    reviews={reviews}
+                />
+            )}
 
             {/* Reviews */}
             <section className="space-y-4">

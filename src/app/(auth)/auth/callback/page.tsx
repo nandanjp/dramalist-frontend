@@ -41,7 +41,7 @@ function CallbackSpinner() {
     return (
         <div className="flex flex-col items-center gap-3 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Signing you in…</p>
+            <p className="text-sm text-muted-foreground">Completing sign-in…</p>
         </div>
     );
 }

@@ -133,6 +133,7 @@ const columns: ColumnDef<UserListEntry>[] = [
     {
         accessorKey: "genre",
         header: "Genre",
+        meta: { className: "hidden lg:table-cell" },
         cell: ({ row }) => (
             <span className="text-sm text-muted-foreground">
                 {row.original.genre.slice(0, 2).join(", ") || "—"}
@@ -142,11 +143,13 @@ const columns: ColumnDef<UserListEntry>[] = [
     {
         accessorKey: "year",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Year" />,
+        meta: { className: "hidden sm:table-cell" },
         cell: ({ row }) => row.original.year ?? <span className="text-muted-foreground">—</span>,
     },
     {
         accessorKey: "updated_at",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Updated" />,
+        meta: { className: "hidden sm:table-cell" },
         cell: ({ row }) => (
             <span className="text-sm text-muted-foreground">
                 {formatDistanceToNow(row.original.updated_at)}

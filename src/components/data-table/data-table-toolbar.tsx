@@ -29,7 +29,7 @@ export function DataTableToolbar<TData>({
                     placeholder={filterPlaceholder}
                     value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
                     onChange={(e) => table.getColumn(filterColumn)?.setFilterValue(e.target.value)}
-                    className="h-8 w-64"
+                    className="h-8 w-full sm:w-64"
                 />
             )}
 

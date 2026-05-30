@@ -1,11 +1,12 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import { useLogin } from "@/hooks/use-auth-mutations";
 import { Button } from "@/components/ui/button";
@@ -18,14 +19,6 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 const schema = z.object({
@@ -38,6 +31,7 @@ export default function LoginPage() {
     const router = useRouter();
     const { login } = useAuth();
     const loginMutation = useLogin();
+    const [showPassword, setShowPassword] = React.useState(false);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(schema),
@@ -63,104 +57,116 @@ export default function LoginPage() {
     }
 
     return (
-        <Card className="w-full max-w-sm">
-            <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Welcome back</CardTitle>
-                <CardDescription>Sign in to your Dramalist account</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                    <Button
-                        variant="outline"
-                        type="button"
-                        onClick={() => (window.location.href = "/auth/oauth/google")}
-                    >
-                        <GoogleIcon />
-                        Google
-                    </Button>
-                    <Button
-                        variant="outline"
-                        type="button"
-                        onClick={() => (window.location.href = "/auth/oauth/github")}
-                    >
-                        <GitHubIcon />
-                        GitHub
-                    </Button>
-                </div>
+        <div className="w-full max-w-sm space-y-6">
+            <div className="space-y-1 text-center">
+                <h1 className="text-2xl font-bold">Welcome back</h1>
+                <p className="text-sm text-muted-foreground">Sign in to your account</p>
+            </div>
 
-                <div className="flex items-center gap-3">
-                    <Separator className="flex-1" />
-                    <span className="text-xs text-muted-foreground">or</span>
-                    <Separator className="flex-1" />
-                </div>
+            <div className="grid grid-cols-2 gap-3">
+                <Button
+                    variant="outline"
+                    type="button"
+                    className="w-full"
+                    onClick={() => (window.location.href = "/auth/oauth/google")}
+                >
+                    <GoogleIcon />
+                    Google
+                </Button>
+                <Button
+                    variant="outline"
+                    type="button"
+                    className="w-full"
+                    onClick={() => (window.location.href = "/auth/oauth/github")}
+                >
+                    <GitHubIcon />
+                    GitHub
+                </Button>
+            </div>
 
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
+            <div className="flex items-center gap-3">
+                <Separator className="flex-1" />
+                <span className="text-xs text-muted-foreground">or continue with email</span>
+                <Separator className="flex-1" />
+            </div>
+
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="email"
+                                        placeholder="you@example.com"
+                                        autoComplete="email"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Password</FormLabel>
+                                <FormControl>
+                                    <div className="relative">
                                         <Input
-                                            type="email"
-                                            placeholder="you@example.com"
-                                            autoComplete="email"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             placeholder="••••••••"
                                             autoComplete="current-password"
+                                            className="pr-10"
                                             {...field}
                                         />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        {form.formState.errors.root && (
-                            <p className="text-sm text-destructive">
-                                {form.formState.errors.root.message}
-                            </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword((v) => !v)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                            tabIndex={-1}
+                                            aria-label={showPassword ? "Hide password" : "Show password"}
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
                         )}
+                    />
 
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={loginMutation.isPending}
-                        >
-                            {loginMutation.isPending && (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            )}
-                            Sign in
-                        </Button>
-                    </form>
-                </Form>
-            </CardContent>
-            <CardFooter className="justify-center">
-                <p className="text-sm text-muted-foreground">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="font-medium text-foreground underline underline-offset-4">
-                        Sign up
-                    </Link>
-                </p>
-            </CardFooter>
-        </Card>
+                    {form.formState.errors.root && (
+                        <p className="text-sm text-destructive">
+                            {form.formState.errors.root.message}
+                        </p>
+                    )}
+
+                    <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+                        {loginMutation.isPending && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Sign in
+                    </Button>
+                </form>
+            </Form>
+
+            <p className="text-center text-sm text-muted-foreground">
+                Don&apos;t have an account?{" "}
+                <Link href="/signup" className="font-medium text-foreground underline underline-offset-4">
+                    Sign up
+                </Link>
+            </p>
+        </div>
     );
 }
 

@@ -1,11 +1,12 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import { useRegister } from "@/hooks/use-auth-mutations";
 import { Button } from "@/components/ui/button";
@@ -18,14 +19,6 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 const schema = z
@@ -42,15 +35,54 @@ const schema = z
 
 type FormValues = z.infer<typeof schema>;
 
+function getPasswordStrength(password: string): { score: number; label: string } {
+    if (!password) return { score: 0, label: "" };
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    const label = score <= 1 ? "Weak" : score <= 2 ? "Medium" : score <= 3 ? "Good" : "Strong";
+    return { score, label };
+}
+
+function PasswordStrengthBar({ password }: { password: string }) {
+    const { score, label } = getPasswordStrength(password);
+    if (!password) return null;
+
+    const colors = ["bg-destructive", "bg-destructive", "bg-yellow-500", "bg-yellow-500", "bg-green-500"];
+    const barColor = colors[score] ?? "bg-destructive";
+
+    return (
+        <div className="space-y-1">
+            <div className="flex gap-1">
+                {[1, 2, 3].map((i) => (
+                    <div
+                        key={i}
+                        className={`h-1 flex-1 rounded-full transition-colors ${
+                            score >= i * (4 / 3) ? barColor : "bg-muted"
+                        }`}
+                    />
+                ))}
+            </div>
+            <p className="text-xs text-muted-foreground">{label}</p>
+        </div>
+    );
+}
+
 export default function SignupPage() {
     const router = useRouter();
     const { login } = useAuth();
     const registerMutation = useRegister();
+    const [showPassword, setShowPassword] = React.useState(false);
+    const [showConfirm, setShowConfirm] = React.useState(false);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(schema),
         defaultValues: { display_name: "", email: "", password: "", confirm_password: "" },
     });
+
+    const passwordValue = form.watch("password");
 
     async function onSubmit(values: FormValues) {
         try {
@@ -71,142 +103,175 @@ export default function SignupPage() {
     }
 
     return (
-        <Card className="w-full max-w-sm">
-            <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Create your account</CardTitle>
-                <CardDescription>Start tracking your drama list today</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                    <Button
-                        variant="outline"
-                        type="button"
-                        onClick={() => (window.location.href = "/auth/oauth/google")}
-                    >
-                        <GoogleIcon />
-                        Google
-                    </Button>
-                    <Button
-                        variant="outline"
-                        type="button"
-                        onClick={() => (window.location.href = "/auth/oauth/github")}
-                    >
-                        <GitHubIcon />
-                        GitHub
-                    </Button>
-                </div>
+        <div className="w-full max-w-sm space-y-6">
+            <div className="space-y-1 text-center">
+                <h1 className="text-2xl font-bold">Create your account</h1>
+                <p className="text-sm text-muted-foreground">Start tracking your drama list today</p>
+            </div>
 
-                <div className="flex items-center gap-3">
-                    <Separator className="flex-1" />
-                    <span className="text-xs text-muted-foreground">or</span>
-                    <Separator className="flex-1" />
-                </div>
+            <div className="grid grid-cols-2 gap-3">
+                <Button
+                    variant="outline"
+                    type="button"
+                    className="w-full"
+                    onClick={() => (window.location.href = "/auth/oauth/google")}
+                >
+                    <GoogleIcon />
+                    Google
+                </Button>
+                <Button
+                    variant="outline"
+                    type="button"
+                    className="w-full"
+                    onClick={() => (window.location.href = "/auth/oauth/github")}
+                >
+                    <GitHubIcon />
+                    GitHub
+                </Button>
+            </div>
 
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-                        <FormField
-                            control={form.control}
-                            name="display_name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
-                                    <FormControl>
+            <div className="flex items-center gap-3">
+                <Separator className="flex-1" />
+                <span className="text-xs text-muted-foreground">or sign up with email</span>
+                <Separator className="flex-1" />
+            </div>
+
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="display_name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Name</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Your name"
+                                        autoComplete="name"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="email"
+                                        placeholder="you@example.com"
+                                        autoComplete="email"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Password</FormLabel>
+                                <FormControl>
+                                    <div className="relative">
                                         <Input
-                                            placeholder="Your name"
-                                            autoComplete="name"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="email"
-                                            placeholder="you@example.com"
-                                            autoComplete="email"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             placeholder="At least 8 characters"
                                             autoComplete="new-password"
+                                            className="pr-10"
                                             {...field}
                                         />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="confirm_password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Confirm password</FormLabel>
-                                    <FormControl>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword((v) => !v)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                            tabIndex={-1}
+                                            aria-label={showPassword ? "Hide password" : "Show password"}
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                                <PasswordStrengthBar password={passwordValue} />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="confirm_password"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Confirm password</FormLabel>
+                                <FormControl>
+                                    <div className="relative">
                                         <Input
-                                            type="password"
+                                            type={showConfirm ? "text" : "password"}
                                             placeholder="••••••••"
                                             autoComplete="new-password"
+                                            className="pr-10"
                                             {...field}
                                         />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        {form.formState.errors.root && (
-                            <p className="text-sm text-destructive">
-                                {form.formState.errors.root.message}
-                            </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirm((v) => !v)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                            tabIndex={-1}
+                                            aria-label={showConfirm ? "Hide password" : "Show password"}
+                                        >
+                                            {showConfirm ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
                         )}
+                    />
 
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={registerMutation.isPending}
-                        >
-                            {registerMutation.isPending && (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            )}
-                            Create account
-                        </Button>
-                    </form>
-                </Form>
-            </CardContent>
-            <CardFooter className="justify-center">
-                <p className="text-sm text-muted-foreground">
-                    Already have an account?{" "}
-                    <Link
-                        href="/login"
-                        className="font-medium text-foreground underline underline-offset-4"
+                    {form.formState.errors.root && (
+                        <p className="text-sm text-destructive">
+                            {form.formState.errors.root.message}
+                        </p>
+                    )}
+
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={registerMutation.isPending}
                     >
-                        Sign in
-                    </Link>
-                </p>
-            </CardFooter>
-        </Card>
+                        {registerMutation.isPending && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Create account
+                    </Button>
+                </form>
+            </Form>
+
+            <p className="text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link
+                    href="/login"
+                    className="font-medium text-foreground underline underline-offset-4"
+                >
+                    Sign in
+                </Link>
+            </p>
+        </div>
     );
 }
 

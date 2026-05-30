@@ -45,6 +45,7 @@ function NewReviewForm() {
         try {
             await createMutation.mutateAsync({
                 catalog_id: effectiveCatalogId,
+                catalog_title: selectedCatalog?.title,
                 rating,
                 content: content || undefined,
                 is_public: isPublic,

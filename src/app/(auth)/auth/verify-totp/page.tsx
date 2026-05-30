@@ -57,7 +57,7 @@ function VerifyTotpForm() {
                 <ShieldCheck className="mb-1 h-8 w-8 text-primary" />
                 <CardTitle>Two-factor authentication</CardTitle>
                 <CardDescription>
-                    Enter the 6-digit code from your authenticator app
+                    Open your authenticator app and enter the 6-digit code.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

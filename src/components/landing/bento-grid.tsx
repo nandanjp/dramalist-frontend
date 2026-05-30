@@ -57,7 +57,7 @@ function MyListTile() {
     }, [visible]);
 
     return (
-        <Tile className="row-span-2">
+        <Tile className="sm:col-span-2 lg:col-span-1 lg:row-span-2">
             <TileHeader
                 label="My List"
                 icon={
@@ -320,7 +320,7 @@ function ProfileTile() {
 
 export function BentoGrid() {
     return (
-        <div className="grid grid-cols-3 grid-rows-[auto_auto] gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <MyListTile />
             <ReviewsTile />
             <AiPicksTile />

@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { AppSidebar } from "@/components/app-sidebar";
+import { AuthGate } from "@/components/auth/auth-gate";
 import { NavBreadcrumb } from "@/components/nav-breadcrumb";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Separator } from "@/components/ui/separator";
@@ -21,7 +22,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                         <ThemeToggle />
                     </div>
                 </header>
-                <main className="flex flex-1 flex-col p-4 md:p-6">{children}</main>
+                <main className="flex flex-1 flex-col p-4 md:p-6">
+                    <AuthGate>{children}</AuthGate>
+                </main>
             </SidebarInset>
         </SidebarProvider>
     );

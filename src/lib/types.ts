@@ -223,6 +223,7 @@ export interface UpdateCastMemberRequest {
 export interface Review {
     id: string;
     catalog_id: string;
+    catalog_title: string | null;
     user_id: string;
     rating: number;
     content: string | null;
@@ -248,6 +249,7 @@ export interface ReviewListResponse {
 
 export interface CreateReviewRequest {
     catalog_id: string;
+    catalog_title?: string;
     rating: number;
     content?: string;
     contains_spoilers?: boolean;

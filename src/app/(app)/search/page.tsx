@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { AlertTriangle, Search } from "lucide-react";
 import { useSearch } from "@/hooks/use-search";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { MediaType, SearchResult } from "@/lib/types";
@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CardGridSkeleton } from "@/components/shared/card-grid-skeleton";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Input } from "@/components/ui/input";
 import {
     Select,
@@ -72,7 +73,7 @@ export default function SearchPage() {
     const debouncedQuery = useDebounce(query, 400);
     const enabled = debouncedQuery.length >= 1;
 
-    const { data, isLoading } = useSearch(
+    const { data, isLoading, isError } = useSearch(
         {
             q: debouncedQuery || undefined,
             media_type: mediaType !== "all" ? mediaType : undefined,
@@ -121,6 +122,12 @@ export default function SearchPage() {
                 </p>
             ) : isLoading ? (
                 <CardGridSkeleton count={8} cols="4" />
+            ) : isError ? (
+                <EmptyState
+                    icon={AlertTriangle}
+                    title="Search failed"
+                    description="Something went wrong. Please try again."
+                />
             ) : results.length === 0 ? (
                 <p className="py-16 text-center text-sm text-muted-foreground">
                     No results for &ldquo;{debouncedQuery}&rdquo;.

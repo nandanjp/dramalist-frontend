@@ -100,37 +100,39 @@ export function MoodDemoSection() {
                 </div>
 
                 {/* Input */}
-                <div className="relative">
+                <div className="sm:relative">
                     <textarea
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         onKeyDown={handleKeyDown}
                         rows={3}
                         placeholder={`e.g. "${EXAMPLE_PROMPTS[exampleIndex]}"`}
-                        className="w-full resize-none rounded-2xl border border-slate-700 bg-slate-900 px-5 py-4 pr-36 text-sm text-slate-200 placeholder:text-slate-600 focus:border-violet-500/50 focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+                        className="w-full resize-none rounded-2xl border border-slate-700 bg-slate-900 px-5 py-4 pr-4 text-sm text-slate-200 placeholder:text-slate-600 focus:border-violet-500/50 focus:outline-none focus:ring-2 focus:ring-violet-500/20 sm:pr-36"
                     />
-                    <button
-                        onClick={handleSearch}
-                        disabled={!prompt.trim() || loading}
-                        className="absolute bottom-4 right-4 flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-violet-500 disabled:opacity-40"
-                    >
-                        {loading ? (
-                            <>
-                                <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                </svg>
-                                Thinking…
-                            </>
-                        ) : (
-                            <>
-                                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                Search
-                            </>
-                        )}
-                    </button>
+                    <div className="mt-2 flex justify-end sm:absolute sm:bottom-4 sm:right-4 sm:mt-0">
+                        <button
+                            onClick={handleSearch}
+                            disabled={!prompt.trim() || loading}
+                            className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-violet-500 disabled:opacity-40"
+                        >
+                            {loading ? (
+                                <>
+                                    <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                    </svg>
+                                    Thinking…
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                    Search
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Result */}

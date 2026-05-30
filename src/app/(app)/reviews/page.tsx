@@ -91,13 +91,13 @@ export default function ReviewsPage() {
         {
             id: "title",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Title" />,
-            accessorFn: (row) => row.catalog_id,
+            accessorFn: (row) => row.catalog_title ?? row.catalog_id,
             cell: ({ row }) => (
                 <a
                     href={`/catalog/${row.original.catalog_id}`}
                     className="max-w-[240px] truncate font-medium hover:underline"
                 >
-                    {row.original.catalog_id}
+                    {row.original.catalog_title ?? row.original.catalog_id}
                 </a>
             ),
         },
@@ -109,6 +109,7 @@ export default function ReviewsPage() {
         {
             id: "snippet",
             header: "Review",
+            meta: { className: "hidden md:table-cell" },
             cell: ({ row }) =>
                 row.original.content ? (
                     <p className="max-w-[300px] truncate text-sm text-muted-foreground">
@@ -121,6 +122,7 @@ export default function ReviewsPage() {
         {
             accessorKey: "is_public",
             header: "Visibility",
+            meta: { className: "hidden md:table-cell" },
             cell: ({ row }) =>
                 row.original.is_public ? (
                     <Badge variant="secondary">Public</Badge>
