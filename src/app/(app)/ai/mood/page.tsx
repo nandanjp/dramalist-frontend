@@ -12,6 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CardGridSkeleton } from "@/components/shared/card-grid-skeleton";
 import { Textarea } from "@/components/ui/textarea";
 
+const EXAMPLE_PROMPTS = [
+    "Something emotional and bittersweet set in historical Korea",
+    "A light romance with a tsundere lead and lots of comedy",
+    "Slow-burn detective thriller with a dark atmosphere",
+    "Wholesome slice-of-life about finding yourself",
+];
+
 export default function MoodSearchPage() {
     const [prompt, setPrompt] = React.useState("");
     const moodMutation = useMoodSearch();
@@ -47,6 +54,18 @@ export default function MoodSearchPage() {
                     rows={3}
                     className="resize-none"
                 />
+                <div className="flex flex-wrap gap-2">
+                    {EXAMPLE_PROMPTS.map((p) => (
+                        <button
+                            key={p}
+                            type="button"
+                            onClick={() => setPrompt(p)}
+                            className="rounded-full border px-3 py-1 text-xs text-muted-foreground hover:border-foreground hover:text-foreground transition-colors"
+                        >
+                            {p}
+                        </button>
+                    ))}
+                </div>
                 <Button
                     onClick={handleSearch}
                     disabled={moodMutation.isPending || !prompt.trim()}

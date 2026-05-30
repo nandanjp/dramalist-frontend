@@ -61,7 +61,16 @@ export function useAddToList() {
                 method: "POST",
                 body: JSON.stringify(data),
             }),
-        onSuccess: () => {
+        onSuccess: (newEntry) => {
+            // Write the new entry into all list caches immediately
+            qc.setQueriesData<UserListResponse>({ queryKey: listKeys.all() }, (old) => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    total: old.total + 1,
+                    entries: [newEntry, ...old.entries],
+                };
+            });
             qc.invalidateQueries({ queryKey: listKeys.all() });
         },
     });
@@ -75,8 +84,44 @@ export function useUpdateListEntry(id: string) {
                 method: "PATCH",
                 body: JSON.stringify(data),
             }),
+        onMutate: async (newData) => {
+            await qc.cancelQueries({ queryKey: listKeys.all() });
+
+            const previousDetail = qc.getQueryData<UserListEntry>(listKeys.detail(id));
+            const previousEntries = qc.getQueriesData<UserListResponse>({ queryKey: listKeys.all() });
+
+            // Optimistically update detail cache
+            if (previousDetail) {
+                qc.setQueryData(listKeys.detail(id), { ...previousDetail, ...newData });
+            }
+
+            // Optimistically update in all entries list caches
+            qc.setQueriesData<UserListResponse>({ queryKey: listKeys.all() }, (old) => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    entries: old.entries.map((e) =>
+                        e.id === id ? { ...e, ...newData } : e
+                    ),
+                };
+            });
+
+            return { previousDetail, previousEntries };
+        },
+        onError: (_, __, context) => {
+            if (context?.previousDetail) {
+                qc.setQueryData(listKeys.detail(id), context.previousDetail);
+            }
+            if (context?.previousEntries) {
+                for (const [key, data] of context.previousEntries) {
+                    qc.setQueryData(key, data);
+                }
+            }
+        },
         onSuccess: (data) => {
             qc.setQueryData(listKeys.detail(id), data);
+        },
+        onSettled: () => {
             qc.invalidateQueries({ queryKey: listKeys.all() });
         },
     });
@@ -86,7 +131,29 @@ export function useDeleteListEntry() {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: (id: string) => apiFetch(`/api/list/${id}`, { method: "DELETE" }),
-        onSuccess: () => {
+        onMutate: async (id) => {
+            await qc.cancelQueries({ queryKey: listKeys.all() });
+            const previousEntries = qc.getQueriesData<UserListResponse>({ queryKey: listKeys.all() });
+
+            qc.setQueriesData<UserListResponse>({ queryKey: listKeys.all() }, (old) => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    total: Math.max(0, old.total - 1),
+                    entries: old.entries.filter((e) => e.id !== id),
+                };
+            });
+
+            return { previousEntries };
+        },
+        onError: (_, __, context) => {
+            if (context?.previousEntries) {
+                for (const [key, data] of context.previousEntries) {
+                    qc.setQueryData(key, data);
+                }
+            }
+        },
+        onSettled: () => {
             qc.invalidateQueries({ queryKey: listKeys.all() });
         },
     });

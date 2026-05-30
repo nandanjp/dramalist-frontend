@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Bot, Globe, Loader2, Plus, Tv2 } from "lucide-react";
+import { ArrowLeft, Bot, Globe, ImageIcon, Loader2, Plus, Tv2 } from "lucide-react";
 import { useCatalogEntry } from "@/hooks/use-catalog";
 import { useReviewAggregate, useCatalogReviews } from "@/hooks/use-reviews";
 import { useShowSummary } from "@/hooks/use-ai";
@@ -168,10 +168,17 @@ export default function CatalogDetailPage() {
 
     if (catalogLoading) {
         return (
-            <div className="max-w-3xl space-y-6">
+            <div className="max-w-4xl space-y-6">
                 <Skeleton className="h-8 w-48" />
-                <Skeleton className="h-44 w-full rounded-xl" />
-                <Skeleton className="h-32 w-full rounded-xl" />
+                <div className="flex gap-6">
+                    <Skeleton className="h-64 w-44 shrink-0 rounded-xl" />
+                    <div className="flex-1 space-y-3">
+                        <Skeleton className="h-8 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-20 w-full" />
+                    </div>
+                </div>
             </div>
         );
     }
@@ -186,7 +193,7 @@ export default function CatalogDetailPage() {
     }
 
     return (
-        <div className="max-w-3xl space-y-8">
+        <div className="max-w-4xl space-y-8">
             {/* Top bar */}
             <div className="flex items-center justify-between">
                 <Button variant="ghost" size="sm" asChild className="-ml-2">
@@ -201,17 +208,34 @@ export default function CatalogDetailPage() {
                 </Button>
             </div>
 
-            {/* Catalog info */}
-            <Card>
-                <CardContent className="space-y-4 pt-6">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="min-w-0">
-                            <h1 className="text-2xl font-bold leading-tight">{catalog.title}</h1>
-                            {catalog.original_title && (
-                                <p className="text-sm text-muted-foreground">{catalog.original_title}</p>
-                            )}
+            {/* Hero: poster + metadata */}
+            <div className="flex gap-6">
+                {/* Poster */}
+                <div className="hidden shrink-0 sm:block">
+                    {catalog.poster_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            src={catalog.poster_url}
+                            alt={catalog.title}
+                            className="h-64 w-44 rounded-xl object-cover shadow-md"
+                        />
+                    ) : (
+                        <div className="flex h-64 w-44 items-center justify-center rounded-xl bg-muted shadow-inner">
+                            <ImageIcon className="h-10 w-10 text-muted-foreground opacity-40" />
                         </div>
-                        <Badge variant="outline" className="capitalize">{catalog.media_type}</Badge>
+                    )}
+                </div>
+
+                {/* Metadata */}
+                <div className="min-w-0 flex-1 space-y-4">
+                    <div>
+                        <div className="flex flex-wrap items-start gap-3">
+                            <h1 className="text-2xl font-bold leading-tight">{catalog.title}</h1>
+                            <Badge variant="outline" className="capitalize">{catalog.media_type}</Badge>
+                        </div>
+                        {catalog.original_title && (
+                            <p className="mt-0.5 text-sm text-muted-foreground">{catalog.original_title}</p>
+                        )}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
@@ -244,48 +268,38 @@ export default function CatalogDetailPage() {
                         <p className="text-sm text-muted-foreground">{catalog.synopsis}</p>
                     )}
 
-                    {catalog.cast && catalog.cast.length > 0 && (
-                        <>
-                            <Separator />
-                            <div className="space-y-2">
-                                <p className="text-sm font-medium">Cast</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {catalog.cast.slice(0, 8).map((c) => (
-                                        <Badge key={c.cast_id} variant="outline" className="text-xs">
-                                            {c.actor_name}
-                                            {c.character_name && (
-                                                <span className="ml-1 text-muted-foreground">
-                                                    as {c.character_name}
-                                                </span>
-                                            )}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            </div>
-                        </>
+                    {aggregate && aggregate.avg_rating != null && (
+                        <div className="flex items-center gap-3 text-sm">
+                            <RatingStars rating={aggregate.avg_rating} />
+                            <span className="font-semibold">{aggregate.avg_rating.toFixed(1)}</span>
+                            <span className="text-muted-foreground">
+                                {aggregate.review_count} review{aggregate.review_count !== 1 ? "s" : ""}
+                            </span>
+                        </div>
                     )}
+                </div>
+            </div>
 
-                    {aggregate && (
-                        <>
-                            <Separator />
-                            <div className="flex items-center gap-4 text-sm">
-                                {aggregate.avg_rating != null && (
-                                    <div className="flex items-center gap-2">
-                                        <RatingStars rating={aggregate.avg_rating} />
-                                        <span className="font-semibold">
-                                            {aggregate.avg_rating.toFixed(1)}
-                                        </span>
-                                    </div>
+            {/* Cast strip */}
+            {catalog.cast && catalog.cast.length > 0 && (
+                <div className="space-y-2">
+                    <p className="text-sm font-medium">Cast</p>
+                    <div className="flex flex-wrap gap-2">
+                        {catalog.cast.slice(0, 10).map((c) => (
+                            <Badge key={c.cast_id} variant="outline" className="text-xs">
+                                {c.actor_name}
+                                {c.character_name && (
+                                    <span className="ml-1 text-muted-foreground">
+                                        as {c.character_name}
+                                    </span>
                                 )}
-                                <span className="text-muted-foreground">
-                                    {aggregate.review_count} review
-                                    {aggregate.review_count !== 1 ? "s" : ""}
-                                </span>
-                            </div>
-                        </>
-                    )}
-                </CardContent>
-            </Card>
+                            </Badge>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <Separator />
 
             {/* AI summary — shown only after reviews have loaded */}
             {!reviewsLoading && (

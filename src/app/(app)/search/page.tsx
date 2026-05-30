@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { AlertTriangle, Search } from "lucide-react";
 import { useSearch } from "@/hooks/use-search";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -10,10 +11,9 @@ import { MEDIA_TYPES, MEDIA_TYPE_LABELS } from "@/lib/types";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CardGridSkeleton } from "@/components/shared/card-grid-skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     Select,
     SelectContent,
@@ -22,52 +22,87 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-function SearchResultCard({ result }: { result: SearchResult }) {
+function SearchResultRow({ result }: { result: SearchResult }) {
     return (
-        <Card className="flex flex-col">
-            <CardHeader className="pb-2">
-                <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="line-clamp-2 text-base">
-                        <Link href={`/catalog/${result.catalog_id}`} className="hover:underline">
+        <div className="flex gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/40">
+            {/* Poster */}
+            <div className="shrink-0">
+                {result.poster_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                        src={result.poster_url}
+                        alt={result.title}
+                        className="h-20 w-14 rounded object-cover sm:h-24 sm:w-16"
+                    />
+                ) : (
+                    <div className="h-20 w-14 rounded bg-muted sm:h-24 sm:w-16" />
+                )}
+            </div>
+
+            {/* Content */}
+            <div className="flex min-w-0 flex-1 flex-col justify-between gap-1">
+                <div className="space-y-0.5">
+                    <div className="flex flex-wrap items-start gap-2">
+                        <Link
+                            href={`/catalog/${result.catalog_id}`}
+                            className="font-semibold leading-tight hover:underline"
+                        >
                             {result.title}
                         </Link>
-                    </CardTitle>
-                    <Badge variant="outline" className="shrink-0 text-xs capitalize">
-                        {result.media_type}
-                    </Badge>
+                        <Badge variant="outline" className="shrink-0 text-xs capitalize">
+                            {result.media_type}
+                        </Badge>
+                    </div>
+                    {result.original_title && (
+                        <p className="truncate text-xs text-muted-foreground">{result.original_title}</p>
+                    )}
+                    <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                        {result.year && <span>{result.year}</span>}
+                        {result.country && <span>{result.country}</span>}
+                        <span className="capitalize">{result.airing_status}</span>
+                    </div>
                 </div>
-                {result.original_title && (
-                    <p className="truncate text-xs text-muted-foreground">{result.original_title}</p>
-                )}
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col justify-between space-y-3">
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    {result.year && <span>{result.year}</span>}
-                    {result.country && <span>{result.country}</span>}
-                    <span className="capitalize">{result.airing_status}</span>
-                </div>
+
                 {result.synopsis && (
                     <p className="line-clamp-2 text-xs text-muted-foreground">{result.synopsis}</p>
                 )}
-                {result.genre.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                        {result.genre.slice(0, 3).map((g) => (
-                            <Badge key={g} variant="secondary" className="text-xs">
-                                {g}
-                            </Badge>
-                        ))}
-                    </div>
-                )}
-                <Button size="sm" variant="outline" className="w-full" asChild>
-                    <Link href={`/catalog/${result.catalog_id}`}>View details</Link>
-                </Button>
-            </CardContent>
-        </Card>
+
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    {result.genre.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                            {result.genre.slice(0, 3).map((g) => (
+                                <Badge key={g} variant="secondary" className="text-xs">
+                                    {g}
+                                </Badge>
+                            ))}
+                        </div>
+                    )}
+                    <Button size="sm" variant="ghost" className="h-7 shrink-0 text-xs" asChild>
+                        <Link href={`/catalog/${result.catalog_id}`}>View details →</Link>
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ResultSkeleton() {
+    return (
+        <div className="flex gap-3 rounded-lg border p-3">
+            <Skeleton className="h-20 w-14 shrink-0 rounded sm:h-24 sm:w-16" />
+            <div className="flex-1 space-y-2 py-1">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-3 w-32" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-3/4" />
+            </div>
+        </div>
     );
 }
 
 export default function SearchPage() {
-    const [query, setQuery] = React.useState("");
+    const searchParams = useSearchParams();
+    const [query, setQuery] = React.useState(() => searchParams.get("q") ?? "");
     const [mediaType, setMediaType] = React.useState<MediaType | "all">("all");
 
     const debouncedQuery = useDebounce(query, 400);
@@ -96,6 +131,7 @@ export default function SearchPage() {
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         className="pl-9"
+                        autoFocus={!!searchParams.get("q")}
                     />
                 </div>
                 <Select
@@ -121,7 +157,9 @@ export default function SearchPage() {
                     Type to search the catalog.
                 </p>
             ) : isLoading ? (
-                <CardGridSkeleton count={8} cols="4" />
+                <div className="space-y-2">
+                    {Array.from({ length: 5 }).map((_, i) => <ResultSkeleton key={i} />)}
+                </div>
             ) : isError ? (
                 <EmptyState
                     icon={AlertTriangle}
@@ -135,9 +173,9 @@ export default function SearchPage() {
             ) : (
                 <>
                     <p className="text-sm text-muted-foreground">{data?.total ?? results.length} results</p>
-                    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                    <div className="space-y-2">
                         {results.map((r) => (
-                            <SearchResultCard key={r.catalog_id} result={r} />
+                            <SearchResultRow key={r.catalog_id} result={r} />
                         ))}
                     </div>
                 </>

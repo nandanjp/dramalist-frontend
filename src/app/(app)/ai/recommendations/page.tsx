@@ -1,6 +1,7 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Search, Sparkles } from "lucide-react";
 import { useMe } from "@/hooks/use-user";
 import { useListEntries } from "@/hooks/use-list";
 import { useRecommendations } from "@/hooks/use-ai";
@@ -8,12 +9,13 @@ import type { AIRecommendation } from "@/lib/types";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CardGridSkeleton } from "@/components/shared/card-grid-skeleton";
 
 function RecommendationCard({ rec }: { rec: AIRecommendation }) {
+    const searchHref = `/search?q=${encodeURIComponent(rec.title)}`;
     return (
-        <Card>
+        <Card className="flex flex-col">
             <CardHeader className="pb-2">
                 <CardTitle className="text-base">{rec.title}</CardTitle>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -21,7 +23,7 @@ function RecommendationCard({ rec }: { rec: AIRecommendation }) {
                     {rec.estimated_episodes && <span>{rec.estimated_episodes} episodes</span>}
                 </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="flex-1 space-y-3">
                 <p className="text-sm text-muted-foreground">{rec.reason}</p>
                 {(rec.genre?.length ?? 0) > 0 && (
                     <div className="flex flex-wrap gap-1">
@@ -33,6 +35,14 @@ function RecommendationCard({ rec }: { rec: AIRecommendation }) {
                     </div>
                 )}
             </CardContent>
+            <CardFooter className="pt-0">
+                <Button size="sm" variant="outline" className="w-full" asChild>
+                    <Link href={searchHref}>
+                        <Search className="mr-2 h-3.5 w-3.5" />
+                        Search catalog
+                    </Link>
+                </Button>
+            </CardFooter>
         </Card>
     );
 }

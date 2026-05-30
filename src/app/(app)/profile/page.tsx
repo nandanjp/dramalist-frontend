@@ -10,6 +10,7 @@ import type { MeResponse } from "@/lib/types";
 import { getInitials } from "@/lib/utils";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
+import { MediaUpload } from "@/components/shared/media-upload";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -154,6 +155,18 @@ function ProfileForm({ me }: { me: MeResponse }) {
                             )}
                         />
 
+                        <FormItem>
+                            <FormLabel>Avatar</FormLabel>
+                            <MediaUpload
+                                entityType="user"
+                                entityId={me.profile.id}
+                                mediaType="avatar"
+                                currentUrl={avatarUrl || undefined}
+                                onSuccess={(url) => form.setValue("avatar_url", url, { shouldDirty: true })}
+                                label="Upload avatar"
+                                previewClassName="h-32 w-32 rounded-full overflow-hidden"
+                            />
+                        </FormItem>
                         <FormField
                             control={form.control}
                             name="avatar_url"
@@ -161,7 +174,7 @@ function ProfileForm({ me }: { me: MeResponse }) {
                                 <FormItem>
                                     <FormLabel>Avatar URL</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="https://…" {...field} />
+                                        <Input placeholder="https://… (or upload above)" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
