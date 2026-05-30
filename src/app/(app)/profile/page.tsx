@@ -155,8 +155,8 @@ function ProfileForm({ me }: { me: MeResponse }) {
                             )}
                         />
 
-                        <FormItem>
-                            <FormLabel>Avatar</FormLabel>
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium leading-none">Avatar</p>
                             <MediaUpload
                                 entityType="user"
                                 entityId={me.profile.id}
@@ -166,7 +166,7 @@ function ProfileForm({ me }: { me: MeResponse }) {
                                 label="Upload avatar"
                                 previewClassName="h-32 w-32 rounded-full overflow-hidden"
                             />
-                        </FormItem>
+                        </div>
                         <FormField
                             control={form.control}
                             name="avatar_url"
