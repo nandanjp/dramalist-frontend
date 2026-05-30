@@ -82,6 +82,7 @@ export default function SignupPage() {
         defaultValues: { display_name: "", email: "", password: "", confirm_password: "" },
     });
 
+    // eslint-disable-next-line react-hooks/incompatible-library
     const passwordValue = form.watch("password");
 
     async function onSubmit(values: FormValues) {
