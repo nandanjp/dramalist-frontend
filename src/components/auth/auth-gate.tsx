@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/providers/auth-provider";
+import { useAuth } from "@/hooks/use-auth";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
     const { isLoading } = useAuth();
@@ -9,7 +9,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     if (isLoading) {
         return (
             <div className="flex flex-1 items-center justify-center py-24">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
             </div>
         );
     }

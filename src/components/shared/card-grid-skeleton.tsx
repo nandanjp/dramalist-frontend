@@ -22,10 +22,7 @@ export function CardGridSkeleton({
             )}
         >
             {Array.from({ length: count }).map((_, i) => (
-                <Skeleton
-                    key={i}
-                    className={cn("h-44 rounded-xl", skeletonClassName)}
-                />
+                <Skeleton key={i} className={cn("h-44 rounded-xl", skeletonClassName)} />
             ))}
         </div>
     );

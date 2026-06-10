@@ -30,6 +30,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
@@ -37,6 +38,8 @@ interface DataTableProps<TData> {
     columns: ColumnDef<TData>[];
     data: TData[];
     isLoading?: boolean;
+    /** Dims the table while a background fetch is in flight (keeps existing rows visible). */
+    isFetching?: boolean;
     /** Column id to enable text filter on. */
     filterColumn?: string;
     filterPlaceholder?: string;
@@ -47,18 +50,22 @@ interface DataTableProps<TData> {
     pageSizeOptions?: number[];
     /** Called with the current table instance so the parent can add actions above the table. */
     renderToolbarActions?: (table: ReturnType<typeof useReactTable<TData>>) => React.ReactNode;
+    /** Makes rows clickable — receives the full row object. */
+    onRowClick?: (row: TData) => void;
 }
 
 export function DataTable<TData>({
     columns,
     data,
     isLoading = false,
+    isFetching = false,
     filterColumn,
     filterPlaceholder,
     toolbarExtra,
     pageSize = 20,
     pageSizeOptions,
     renderToolbarActions,
+    onRowClick,
 }: DataTableProps<TData>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -96,7 +103,12 @@ export function DataTable<TData>({
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto rounded-md border">
+            <div
+                className={cn(
+                    "overflow-x-auto rounded-md border transition-opacity duration-150",
+                    isFetching && !isLoading && "pointer-events-none opacity-60",
+                )}
+            >
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -132,7 +144,7 @@ export function DataTable<TData>({
                         ) : table.getRowModel().rows.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={colCount} className="h-32 text-center">
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-muted-foreground text-sm">
                                         No results found.
                                     </p>
                                 </TableCell>
@@ -142,6 +154,10 @@ export function DataTable<TData>({
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
+                                    onClick={
+                                        onRowClick ? () => onRowClick(row.original) : undefined
+                                    }
+                                    className={cn(onRowClick && "cursor-pointer")}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell

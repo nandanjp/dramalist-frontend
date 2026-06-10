@@ -14,11 +14,11 @@ export function ReviewPreviewCard({ review }: ReviewPreviewCardProps) {
         <Card className="flex flex-col gap-2 p-4">
             <RatingStars rating={review.rating} />
             {review.content_snippet && (
-                <p className="line-clamp-3 text-sm text-muted-foreground">
+                <p className="text-muted-foreground line-clamp-3 text-sm">
                     {review.content_snippet}
                 </p>
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
                 {formatDistanceToNow(review.created_at)}
             </p>
         </Card>
@@ -38,9 +38,9 @@ export function ReviewCard({ review, actions }: ReviewCardProps) {
             <CardContent className="space-y-2 pt-4">
                 <RatingStars rating={review.rating} />
                 {review.content && (
-                    <p className="line-clamp-4 text-sm text-muted-foreground">{review.content}</p>
+                    <p className="text-muted-foreground line-clamp-4 text-sm">{review.content}</p>
                 )}
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                     {formatDistanceToNow(review.created_at)}
                     {!review.is_public && " · Private"}
                 </p>

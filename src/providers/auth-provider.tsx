@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { createContext, useCallback, useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch, refreshToken, setToken } from "@/lib/api";
+import { useLogout as useLogoutMutation } from "@/hooks/use-auth-mutations";
 import type { MeResponse, Profile } from "@/lib/types";
 
 interface AuthState {
@@ -10,7 +11,7 @@ interface AuthState {
     isLoading: boolean;
     isAuthenticated: boolean;
     login: (token: string, expiresIn?: number) => Promise<void>;
-    logout: () => Promise<void>;
+    logout: () => void;
 }
 
 export const AuthContext = createContext<AuthState | null>(null);
@@ -18,74 +19,65 @@ export const AuthContext = createContext<AuthState | null>(null);
 const REFRESH_LEAD_MS = 60_000;
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<Profile | null>(null);
-    const [isLoading, setLoading] = useState(true);
-    // Tracks when the current access token expires; drives the refresh timer.
+    // Tracks when the current access token expires; drives the refresh timer and gates the user query.
     const [expiresAt, setExpiresAt] = useState<number | null>(null);
-    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [isInitialized, setIsInitialized] = useState(false);
     const qc = useQueryClient();
+    const { mutate: callLogout } = useLogoutMutation();
 
-    const fetchAndSetUser = useCallback(async () => {
-        try {
-            const data = await apiFetch<MeResponse>("/api/users/me");
-            setUser(data.profile);
-            // Prefill React Query cache so useMe() callers skip a redundant network request.
-            qc.setQueryData(["user", "me"], data);
-        } catch {
-            setUser(null);
-        }
-    }, [qc]);
+    const { data: meData, isLoading: meLoading } = useQuery({
+        queryKey: ["user", "me"],
+        queryFn: () => apiFetch<MeResponse>("/api/users/me"),
+        enabled: expiresAt !== null,
+        retry: false,
+        staleTime: 5 * 60 * 1000,
+    });
 
-    const login = useCallback(
-        async (token: string, expiresIn = 900) => {
-            setToken(token);
-            setExpiresAt(Date.now() + expiresIn * 1000);
-            // Fetch user profile — throws on failure so callers can show an error.
-            const data = await apiFetch<MeResponse>("/api/users/me");
-            setUser(data.profile);
-            qc.setQueryData(["user", "me"], data);
-        },
-        [qc],
-    );
+    const user = meData?.profile ?? null;
+    // Block consumers until the initial session restore attempt is complete.
+    // If a token was found, also wait for the user query to resolve.
+    const isLoading = !isInitialized || meLoading;
 
-    const logout = useCallback(async () => {
-        try {
-            await apiFetch("/auth/logout", { method: "POST" });
-        } catch {
-            // best-effort
-        }
-        setToken(null);
-        setUser(null);
-        setExpiresAt(null);
-        if (timerRef.current) clearTimeout(timerRef.current);
+    const login = useCallback(async (token: string, expiresIn = 900) => {
+        setToken(token);
+        setExpiresAt(Date.now() + expiresIn * 1000);
     }, []);
 
+    const logout = useCallback(() => {
+        callLogout(undefined, {
+            onSettled: () => {
+                setToken(null);
+                setExpiresAt(null);
+                qc.clear();
+            },
+        });
+    }, [callLogout, qc]);
+
     // Proactive refresh: fires REFRESH_LEAD_MS before the token expires.
-    // Re-runs whenever expiresAt changes (i.e. after each successful refresh).
     useEffect(() => {
         if (!expiresAt) return;
         const delay = Math.max(0, expiresAt - Date.now() - REFRESH_LEAD_MS);
-        timerRef.current = setTimeout(async () => {
+        const timer = setTimeout(async () => {
             const result = await refreshToken();
             if (result) setExpiresAt(Date.now() + result.expiresIn * 1000);
-            else setUser(null);
-        }, delay);
-        return () => {
-            if (timerRef.current) clearTimeout(timerRef.current);
-        };
-    }, [expiresAt]);
-
-    // On mount: attempt a silent token refresh to restore session.
-    useEffect(() => {
-        (async () => {
-            const result = await refreshToken();
-            if (result) {
-                setExpiresAt(Date.now() + result.expiresIn * 1000);
-                await fetchAndSetUser();
+            else {
+                setToken(null);
+                setExpiresAt(null);
+                qc.removeQueries({ queryKey: ["user", "me"] });
             }
-            setLoading(false);
-        })();
-    }, [fetchAndSetUser]);
+        }, delay);
+        return () => clearTimeout(timer);
+    }, [expiresAt, qc]);
+
+    // On mount: attempt a silent token refresh to restore an existing session.
+    useEffect(() => {
+        async function restoreSession() {
+            const result = await refreshToken();
+            if (result) setExpiresAt(Date.now() + result.expiresIn * 1000);
+            setIsInitialized(true);
+        }
+        restoreSession();
+    }, []);
 
     return (
         <AuthContext.Provider
@@ -100,10 +92,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             {children}
         </AuthContext.Provider>
     );
-}
-
-export function useAuth() {
-    const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
-    return ctx;
 }

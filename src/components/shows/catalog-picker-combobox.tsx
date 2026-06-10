@@ -96,7 +96,7 @@ export function CatalogPickerCombobox({
                                         <div className="min-w-0">
                                             <p className="truncate text-sm">{result.title}</p>
                                             {result.original_title && (
-                                                <p className="truncate text-xs text-muted-foreground">
+                                                <p className="text-muted-foreground truncate text-xs">
                                                     {result.original_title}
                                                 </p>
                                             )}

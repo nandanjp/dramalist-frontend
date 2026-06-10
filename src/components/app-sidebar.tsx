@@ -1,32 +1,20 @@
 "use client";
 
-import * as React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
-    BookOpen,
-    Brain,
-    ChevronsUpDown,
+    BookMarked,
     LayoutDashboard,
+    Library,
     LogOut,
+    MessageSquare,
     Search,
     Settings,
     Sparkles,
-    Star,
     User,
+    Wand2,
 } from "lucide-react";
-import { useAuth } from "@/providers/auth-provider";
-import { getInitials } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
 import {
     Sidebar,
     SidebarContent,
@@ -39,91 +27,108 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarRail,
+    SidebarSeparator,
 } from "@/components/ui/sidebar";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const NAV_GROUPS = [
+const NAV_MAIN = [
     {
-        label: "Library",
+        label: "Discover",
         items: [
-            { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-            { title: "My List", url: "/list", icon: BookOpen },
-            { title: "Search", url: "/search", icon: Search },
+            { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+            { title: "Catalogue", href: "/catalog", icon: Library },
+            { title: "Search", href: "/search", icon: Search },
         ],
     },
     {
-        label: "Reviews",
-        items: [{ title: "My Reviews", url: "/reviews", icon: Star }],
+        label: "My Content",
+        items: [
+            { title: "My List", href: "/list", icon: BookMarked },
+            { title: "Reviews", href: "/reviews", icon: MessageSquare },
+        ],
     },
     {
         label: "AI",
         items: [
-            { title: "Recommendations", url: "/ai/recommendations", icon: Sparkles },
-            { title: "Mood Search", url: "/ai/mood", icon: Brain },
+            { title: "Recommendations", href: "/ai/recommendations", icon: Sparkles },
+            { title: "Mood Search", href: "/ai/mood", icon: Wand2 },
         ],
     },
-] as const;
+];
 
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar() {
     const pathname = usePathname();
-    const router = useRouter();
-    const { user, logout, isLoading } = useAuth();
+    const { user, logout } = useAuth();
 
-    async function handleLogout() {
-        await logout();
-        router.push("/login");
-    }
+    const initials = user?.display_name ? user.display_name.slice(0, 2).toUpperCase() : "?";
 
     return (
-        <Sidebar {...props}>
+        <Sidebar collapsible="icon">
+            {/* Brand */}
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/dashboard">
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                                    <BookOpen className="size-4" />
-                                </div>
-                                <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-semibold">Dramalist</span>
-                                    <span className="text-xs text-muted-foreground">
-                                        Track &amp; discover
+                                <div className="flex aspect-square h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-sky-500 to-violet-600">
+                                    <span className="font-hand text-sm font-bold text-white">
+                                        D
                                     </span>
                                 </div>
+                                <span className="font-hand bg-linear-to-r from-sky-600 to-violet-600 bg-clip-text text-xl tracking-normal text-transparent dark:from-sky-400 dark:to-violet-400">
+                                    Dramalist
+                                </span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
 
+            <SidebarSeparator />
+
+            {/* Navigation */}
             <SidebarContent>
-                {NAV_GROUPS.map((group) => (
+                {NAV_MAIN.map((group) => (
                     <SidebarGroup key={group.label}>
                         <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
                         <SidebarGroupContent>
                             <SidebarMenu>
-                                {group.items.map((item) => (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton
-                                            asChild
-                                            isActive={
-                                                pathname === item.url ||
-                                                pathname.startsWith(item.url + "/")
-                                            }
-                                        >
-                                            <Link href={item.url}>
-                                                <item.icon />
-                                                {item.title}
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))}
+                                {group.items.map((item) => {
+                                    const isActive =
+                                        item.href === "/dashboard"
+                                            ? pathname === "/dashboard"
+                                            : pathname.startsWith(item.href);
+                                    return (
+                                        <SidebarMenuItem key={item.href}>
+                                            <SidebarMenuButton
+                                                asChild
+                                                isActive={isActive}
+                                                tooltip={item.title}
+                                            >
+                                                <Link href={item.href}>
+                                                    <item.icon />
+                                                    <span>{item.title}</span>
+                                                </Link>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    );
+                                })}
                             </SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
                 ))}
             </SidebarContent>
 
+            <SidebarSeparator />
+
+            {/* User footer */}
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -131,86 +136,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <DropdownMenuTrigger asChild>
                                 <SidebarMenuButton
                                     size="lg"
-                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                    className="data-[state=open]:bg-sidebar-accent"
                                 >
                                     <Avatar className="h-8 w-8 rounded-lg">
-                                        <AvatarImage
-                                            src={user?.avatar_url ?? undefined}
-                                            alt={user?.display_name}
-                                        />
-                                        <AvatarFallback className="rounded-lg">
-                                            {getInitials(user?.display_name)}
+                                        <AvatarImage src={user?.avatar_url ?? undefined} />
+                                        <AvatarFallback className="rounded-lg bg-linear-to-br from-sky-100 to-violet-100 text-xs font-semibold text-violet-700 dark:from-sky-950/60 dark:to-violet-950/60 dark:text-violet-300">
+                                            {initials}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
-                                        {isLoading ? (
-                                            <>
-                                                <Skeleton className="h-3.5 w-24" />
-                                                <Skeleton className="mt-1 h-3 w-32" />
-                                            </>
-                                        ) : (
-                                            <>
-                                                <span className="truncate font-semibold">
-                                                    {user?.display_name ?? "User"}
-                                                </span>
-                                                <span className="truncate text-xs text-muted-foreground">
-                                                    {user?.email}
-                                                </span>
-                                            </>
-                                        )}
+                                        <span className="truncate font-medium">
+                                            {user?.display_name ?? "Account"}
+                                        </span>
+                                        <span className="text-muted-foreground truncate text-xs">
+                                            {user?.email ?? ""}
+                                        </span>
                                     </div>
-                                    <ChevronsUpDown className="ml-auto size-4" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                                side="bottom"
-                                align="end"
-                                sideOffset={4}
-                            >
-                                <DropdownMenuLabel className="p-0 font-normal">
-                                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                        <Avatar className="h-8 w-8 rounded-lg">
-                                            <AvatarImage
-                                                src={user?.avatar_url ?? undefined}
-                                                alt={user?.display_name}
-                                            />
-                                            <AvatarFallback className="rounded-lg">
-                                                {getInitials(user?.display_name)}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div className="grid flex-1 text-left text-sm leading-tight">
-                                            {isLoading ? (
-                                                <>
-                                                    <Skeleton className="h-3.5 w-24" />
-                                                    <Skeleton className="mt-1 h-3 w-32" />
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <span className="truncate font-semibold">
-                                                        {user?.display_name ?? "User"}
-                                                    </span>
-                                                    <span className="truncate text-xs">{user?.email}</span>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
+                            <DropdownMenuContent side="top" align="start" className="w-56">
                                 <DropdownMenuItem asChild>
                                     <Link href="/profile">
                                         <User className="mr-2 h-4 w-4" />
                                         Profile
                                     </Link>
                                 </DropdownMenuItem>
-                                {user?.profile_slug && (
-                                    <DropdownMenuItem asChild>
-                                        <Link href={`/users/${user.profile_slug}`}>
-                                            <User className="mr-2 h-4 w-4" />
-                                            View public profile
-                                        </Link>
-                                    </DropdownMenuItem>
-                                )}
                                 <DropdownMenuItem asChild>
                                     <Link href="/settings">
                                         <Settings className="mr-2 h-4 w-4" />
@@ -219,11 +169,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
-                                    onClick={handleLogout}
-                                    className="cursor-pointer text-destructive focus:text-destructive"
+                                    onClick={() => logout()}
+                                    className="text-destructive focus:text-destructive"
                                 >
                                     <LogOut className="mr-2 h-4 w-4" />
-                                    Log out
+                                    Sign out
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

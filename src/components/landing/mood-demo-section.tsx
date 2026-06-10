@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface MoodResult {
     query: string;
@@ -72,30 +73,40 @@ export function MoodDemoSection() {
                 {/* Heading */}
                 <div className="mb-12 text-center">
                     <span className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-400">
-                        <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        <svg
+                            className="h-3 w-3"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2.5}
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                            />
                         </svg>
                         AI-powered
                     </span>
                     <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                        Describe your mood.<br />
+                        Describe your mood.
+                        <br />
                         <span className="text-violet-400">Find your next drama.</span>
                     </h2>
-                    <p className="mt-4 text-slate-400">
-                        Try it right now — no account needed.
-                    </p>
+                    <p className="mt-4 text-slate-400">Try it right now — no account needed.</p>
                 </div>
 
                 {/* Example prompts */}
                 <div className="mb-4 flex flex-wrap justify-center gap-2">
                     {EXAMPLE_PROMPTS.map((p) => (
-                        <button
+                        <Button
                             key={p}
+                            variant="outline"
                             onClick={() => applyExample(p)}
-                            className="rounded-full border border-slate-700 bg-slate-800/50 px-3 py-1.5 text-xs text-slate-400 transition-colors hover:border-violet-500/50 hover:text-violet-400"
+                            className="h-auto rounded-full border-slate-700 bg-slate-800/50 px-3 py-1.5 text-xs text-slate-400 hover:border-violet-500/50 hover:bg-slate-800/50 hover:text-violet-400"
                         >
                             {p}
-                        </button>
+                        </Button>
                     ))}
                 </div>
 
@@ -107,41 +118,66 @@ export function MoodDemoSection() {
                         onKeyDown={handleKeyDown}
                         rows={3}
                         placeholder={`e.g. "${EXAMPLE_PROMPTS[exampleIndex]}"`}
-                        className="w-full resize-none rounded-2xl border border-slate-700 bg-slate-900 px-5 py-4 pr-4 text-sm text-slate-200 placeholder:text-slate-600 focus:border-violet-500/50 focus:outline-none focus:ring-2 focus:ring-violet-500/20 sm:pr-36"
+                        className="w-full resize-none rounded-2xl border border-slate-700 bg-slate-900 px-5 py-4 pr-4 text-sm text-slate-200 placeholder:text-slate-600 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 focus:outline-none sm:pr-36"
                     />
-                    <div className="mt-2 flex justify-end sm:absolute sm:bottom-4 sm:right-4 sm:mt-0">
-                        <button
+                    <div className="mt-2 flex justify-end sm:absolute sm:right-4 sm:bottom-4 sm:mt-0">
+                        <Button
                             onClick={handleSearch}
                             disabled={!prompt.trim() || loading}
-                            className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-violet-500 disabled:opacity-40"
+                            className="gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500"
                         >
                             {loading ? (
                                 <>
-                                    <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                    <svg
+                                        className="h-3.5 w-3.5 animate-spin"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        />
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                        />
                                     </svg>
                                     Thinking…
                                 </>
                             ) : (
                                 <>
-                                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    <svg
+                                        className="h-3.5 w-3.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth={2.5}
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                        />
                                     </svg>
                                     Search
                                 </>
                             )}
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
                 {/* Result */}
                 {result && (
-                    <div className="mt-6 animate-fade-up rounded-2xl border border-slate-700 bg-slate-900 p-6">
-                        <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-slate-500">
+                    <div className="animate-fade-up mt-6 rounded-2xl border border-slate-700 bg-slate-900 p-6">
+                        <p className="mb-4 text-xs font-semibold tracking-widest text-slate-500 uppercase">
                             Interpreted as
                         </p>
-                        <p className="mb-5 text-sm italic text-slate-300">
+                        <p className="mb-5 text-sm text-slate-300 italic">
                             &ldquo;{result.query}&rdquo;
                         </p>
                         <div className="space-y-3">
@@ -151,7 +187,7 @@ export function MoodDemoSection() {
                                     {result.genres.map((g) => (
                                         <span
                                             key={g}
-                                            className="rounded-full bg-violet-500/15 px-2.5 py-0.5 text-xs font-medium capitalize text-violet-400"
+                                            className="rounded-full bg-violet-500/15 px-2.5 py-0.5 text-xs font-medium text-violet-400 capitalize"
                                         >
                                             {g}
                                         </span>
@@ -164,7 +200,7 @@ export function MoodDemoSection() {
                                     {result.tags.map((t) => (
                                         <span
                                             key={t}
-                                            className="rounded-full border border-slate-700 px-2.5 py-0.5 text-xs capitalize text-slate-400"
+                                            className="rounded-full border border-slate-700 px-2.5 py-0.5 text-xs text-slate-400 capitalize"
                                         >
                                             {t}
                                         </span>
@@ -174,15 +210,26 @@ export function MoodDemoSection() {
                         </div>
                         <div className="mt-5 border-t border-slate-800 pt-4 text-center">
                             <p className="text-xs text-slate-500">
-                                Sign up to search your personal list and get recommendations based on your history.
+                                Sign up to search your personal list and get recommendations based
+                                on your history.
                             </p>
                             <Link
                                 href="/signup"
                                 className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-500"
                             >
                                 Get started — it&apos;s free
-                                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                <svg
+                                    className="h-3.5 w-3.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={2.5}
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                    />
                                 </svg>
                             </Link>
                         </div>
@@ -191,7 +238,10 @@ export function MoodDemoSection() {
 
                 {error && (
                     <p className="mt-4 text-center text-sm text-slate-500">
-                        Couldn&apos;t reach the AI right now. <button onClick={handleSearch} className="text-violet-400 underline">Try again</button>
+                        Couldn&apos;t reach the AI right now.{" "}
+                        <Button variant="link" onClick={handleSearch} className="h-auto p-0 text-sm text-violet-400">
+                            Try again
+                        </Button>
                     </p>
                 )}
             </div>

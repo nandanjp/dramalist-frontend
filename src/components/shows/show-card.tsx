@@ -29,9 +29,7 @@ export function ShowCard({ entry, variant = "default", actions, onClick, href }:
         <Card
             onClick={onClick}
             className={
-                onClick || href
-                    ? "cursor-pointer transition-shadow hover:shadow-md"
-                    : undefined
+                onClick || href ? "cursor-pointer transition-shadow hover:shadow-md" : undefined
             }
         >
             <CardHeader className="pb-2">
@@ -41,7 +39,7 @@ export function ShowCard({ entry, variant = "default", actions, onClick, href }:
                             {entry.title}
                         </CardTitle>
                         {entry.original_title && (
-                            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                            <p className="text-muted-foreground mt-0.5 truncate text-xs">
                                 {entry.original_title}
                             </p>
                         )}
@@ -51,7 +49,7 @@ export function ShowCard({ entry, variant = "default", actions, onClick, href }:
             </CardHeader>
 
             <CardContent className="space-y-2">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
                     {entry.year && <span>{entry.year}</span>}
                     {entry.country && <span>{entry.country}</span>}
                     {variant === "default" && episodeLabel && <span>{episodeLabel}</span>}

@@ -27,7 +27,13 @@ import {
 
 const schema = z.object({
     status: z.enum(["watching", "completed", "dropped", "plan_to_watch", "on_hold"]),
-    episodes_watched: z.coerce.number().int().min(0).optional().or(z.literal("")),
+    episodes_watched: z
+        .string()
+        .optional()
+        .refine(
+            (v) => v === undefined || v === "" || (Number.isInteger(Number(v)) && Number(v) >= 0),
+            { message: "Must be a non-negative whole number" },
+        ),
     notes: z.string().optional(),
     tags: z.string().optional(),
     is_public: z.boolean(),
@@ -47,7 +53,7 @@ function toFormValues(entry?: UserListEntry): ListEntryFormValues {
     }
     return {
         status: entry.status,
-        episodes_watched: entry.episodes_watched || "",
+        episodes_watched: entry.episodes_watched != null ? String(entry.episodes_watched) : "",
         notes: entry.notes ?? "",
         tags: entry.tags.join(", "),
         is_public: entry.is_public,
@@ -173,7 +179,7 @@ export function ListEntryForm({
                         <FormItem className="flex items-center justify-between rounded-lg border p-3">
                             <div>
                                 <FormLabel className="text-sm font-medium">Public</FormLabel>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     Visible on your public profile
                                 </p>
                             </div>

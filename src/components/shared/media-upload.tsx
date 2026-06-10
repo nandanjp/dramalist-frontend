@@ -2,7 +2,11 @@
 
 import * as React from "react";
 import { Upload, X, Loader2, ImageIcon } from "lucide-react";
-import { useMediaUpload, type MediaEntityType, type MediaMediaType } from "@/hooks/use-media-upload";
+import {
+    useMediaUpload,
+    type MediaEntityType,
+    type MediaMediaType,
+} from "@/hooks/use-media-upload";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -73,10 +77,15 @@ export function MediaUpload({
             <div
                 className={cn(
                     "relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors",
-                    isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-muted-foreground/50",
+                    isDragging
+                        ? "border-primary bg-primary/5"
+                        : "border-muted-foreground/25 hover:border-muted-foreground/50",
                     previewClassName ?? "h-40",
                 )}
-                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                }}
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={handleDrop}
                 onClick={() => !isUploading && inputRef.current?.click()}
@@ -103,15 +112,18 @@ export function MediaUpload({
                                 type="button"
                                 size="icon"
                                 variant="destructive"
-                                className="absolute right-1.5 top-1.5 h-6 w-6"
-                                onClick={(e) => { e.stopPropagation(); handleClear(); }}
+                                className="absolute top-1.5 right-1.5 h-6 w-6"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleClear();
+                                }}
                             >
                                 <X className="h-3 w-3" />
                             </Button>
                         )}
                     </>
                 ) : (
-                    <div className="flex flex-col items-center gap-1 p-4 text-center text-muted-foreground">
+                    <div className="text-muted-foreground flex flex-col items-center gap-1 p-4 text-center">
                         {isUploading ? (
                             <>
                                 <Loader2 className="h-6 w-6 animate-spin" />
@@ -149,7 +161,7 @@ export function MediaUpload({
                 </Button>
             )}
 
-            {error && <p className="text-xs text-destructive">{error}</p>}
+            {error && <p className="text-destructive text-xs">{error}</p>}
         </div>
     );
 }

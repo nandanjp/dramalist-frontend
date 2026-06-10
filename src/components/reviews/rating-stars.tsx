@@ -35,9 +35,9 @@ export function RatingStars({ rating, max = 10, className }: RatingStarsProps) {
                 </span>
             )}
             {Array.from({ length: emptyStars }).map((_, i) => (
-                <Star key={`e${i}`} className="h-4 w-4 text-muted-foreground/40" />
+                <Star key={`e${i}`} className="text-muted-foreground/40 h-4 w-4" />
             ))}
-            <span className="ml-1 text-xs tabular-nums text-muted-foreground">
+            <span className="text-muted-foreground ml-1 text-xs tabular-nums">
                 {rating}/{max}
             </span>
         </span>
@@ -104,7 +104,7 @@ export function RatingInput({ value, onChange, max = 10, className }: RatingInpu
                     </span>
                 );
             })}
-            <span className="ml-1 w-8 text-sm tabular-nums text-muted-foreground">
+            <span className="text-muted-foreground ml-1 w-8 text-sm tabular-nums">
                 {display}/10
             </span>
         </div>

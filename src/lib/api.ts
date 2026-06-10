@@ -70,7 +70,10 @@ export async function apiFetch<T = unknown>(path: string, init: RequestInit = {}
     if (res.status === 401 && !isAuthPath) {
         const result = await refreshToken();
         if (!result) {
-            if (typeof window !== "undefined") window.location.href = "/login";
+            if (typeof window !== "undefined") {
+                const next = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `/login?next=${next}`;
+            }
             throw new ApiError(401, "Unauthorized");
         }
         res = await fetch(`${BASE}${path}`, {

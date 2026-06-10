@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState } from "react";
 import { useAddToList, useUpdateListEntry } from "@/hooks/use-list";
 import type { SearchResult, UserListEntry } from "@/lib/types";
 import { toast } from "sonner";
@@ -26,12 +26,13 @@ export function ListEntryDialog({
 }: ListEntryDialogProps) {
     const addMutation = useAddToList();
     const updateMutation = useUpdateListEntry(entry?.id ?? "");
-    const [selectedCatalog, setSelectedCatalog] = React.useState<SearchResult | undefined>();
+    const [selectedCatalog, setSelectedCatalog] = useState<SearchResult | undefined>();
 
     const isEdit = !!entry;
     const isPending = addMutation.isPending || updateMutation.isPending;
 
-    const effectiveCatalogId = entry?.catalog_id ?? selectedCatalog?.catalog_id ?? preselectedCatalogId;
+    const effectiveCatalogId =
+        entry?.catalog_id ?? selectedCatalog?.catalog_id ?? preselectedCatalogId;
 
     async function handleSubmit(values: ListEntryFormValues) {
         const body = formValuesToRequest(values);
@@ -79,9 +80,7 @@ export function ListEntryDialog({
                     />
                 </div>
             )}
-            {isEdit && (
-                <p className="pb-2 text-sm font-medium">{entry.title}</p>
-            )}
+            {isEdit && <p className="pb-2 text-sm font-medium">{entry.title}</p>}
             <ListEntryForm
                 defaultValues={entry}
                 isPending={isPending}

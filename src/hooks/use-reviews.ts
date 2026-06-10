@@ -25,7 +25,6 @@ interface ListParams {
     [key: string]: unknown;
 }
 
-
 export function useMyReviews(params: ListParams = {}) {
     return useQuery({
         queryKey: reviewKeys.mine(params),
@@ -41,7 +40,9 @@ export function useCatalogReviews(catalogID: string, params: ListParams = {}) {
         queryKey: reviewKeys.catalog(catalogID, params),
         queryFn: () => {
             const qs = buildQS(params);
-            return apiFetch<ReviewListResponse>(`/api/reviews/catalog/${catalogID}${qs ? `?${qs}` : ""}`);
+            return apiFetch<ReviewListResponse>(
+                `/api/reviews/catalog/${catalogID}${qs ? `?${qs}` : ""}`,
+            );
         },
         enabled: !!catalogID,
     });

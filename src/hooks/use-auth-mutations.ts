@@ -38,6 +38,12 @@ export function useTotpVerify() {
     });
 }
 
+export function useLogout() {
+    return useMutation({
+        mutationFn: () => apiFetch<void>("/auth/logout", { method: "POST" }),
+    });
+}
+
 export function useLogoutAll() {
     return useMutation({
         mutationFn: () => apiFetch<void>("/auth/logout/all", { method: "POST" }),

@@ -1,13 +1,12 @@
-import { Badge } from "@/components/ui/badge";
-import { STATUS_LABELS, type ShowStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { STATUS_LABELS, type ShowStatus } from "@/lib/types";
 
-const STATUS_CLASSES: Record<ShowStatus, string> = {
-    watching: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-    completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-    dropped: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-    plan_to_watch: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-    on_hold: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+const CONFIG: Record<ShowStatus, { dot: string }> = {
+    watching: { dot: "bg-sky-500" },
+    completed: { dot: "bg-zinc-400" },
+    dropped: { dot: "bg-rose-400" },
+    plan_to_watch: { dot: "bg-amber-400" },
+    on_hold: { dot: "bg-zinc-300" },
 };
 
 interface ShowStatusBadgeProps {
@@ -16,12 +15,16 @@ interface ShowStatusBadgeProps {
 }
 
 export function ShowStatusBadge({ status, className }: ShowStatusBadgeProps) {
+    const { dot } = CONFIG[status];
     return (
-        <Badge
-            variant="outline"
-            className={cn("border-transparent font-medium", STATUS_CLASSES[status], className)}
+        <span
+            className={cn(
+                "text-muted-foreground inline-flex items-center gap-1.5 text-xs",
+                className,
+            )}
         >
+            <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dot)} />
             {STATUS_LABELS[status]}
-        </Badge>
+        </span>
     );
 }

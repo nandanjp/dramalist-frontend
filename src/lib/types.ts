@@ -194,6 +194,35 @@ export type UpdateListEntryRequest = Partial<Omit<AddToListRequest, "catalog_id"
 export interface Actor {
     id: string;
     name: string;
+    native_name: string | null;
+    birthdate: string | null;
+    nationality: string | null;
+    biography: string | null;
+    profile_image_url: string | null;
+}
+
+export interface ActorListResponse {
+    actors: Actor[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
+export interface FilmographyEntry {
+    cast_id: string;
+    catalog_id: string;
+    media_type: MediaType;
+    title: string;
+    original_title: string | null;
+    poster_url: string | null;
+    year: number | null;
+    character_name: string | null;
+    role: CastRole;
+    sort_order: number;
+}
+
+export interface ActorDetail extends Actor {
+    filmography: FilmographyEntry[];
 }
 
 export interface CastMember {

@@ -1,67 +1,96 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+@config "../../tailwind.config.ts";
 
 @layer base {
     :root {
+        /* ── Surface ──────────────────────────────────────── */
         --background: 0 0% 100%;
-        --foreground: 240 10% 3.9%;
+        --foreground: 260 35% 11%;       /* deep violet-black */
+
         --card: 0 0% 100%;
-        --card-foreground: 240 10% 3.9%;
+        --card-foreground: 260 35% 11%;
         --popover: 0 0% 100%;
-        --popover-foreground: 240 10% 3.9%;
-        --primary: 240 5.9% 10%;
-        --primary-foreground: 0 0% 98%;
-        --secondary: 240 4.8% 95.9%;
-        --secondary-foreground: 240 5.9% 10%;
-        --muted: 240 4.8% 95.9%;
-        --muted-foreground: 240 3.8% 46.1%;
-        --accent: 240 4.8% 95.9%;
-        --accent-foreground: 240 5.9% 10%;
-        --destructive: 0 84.2% 60.2%;
+        --popover-foreground: 260 35% 11%;
+
+        /* ── Primary — Electric Violet ────────────────────── */
+        --primary: 262 83% 58%;          /* #7c3aed */
+        --primary-foreground: 0 0% 100%;
+
+        /* ── Secondary / Muted ────────────────────────────── */
+        --secondary: 268 30% 95%;        /* lavender wash */
+        --secondary-foreground: 262 40% 28%;
+        --muted: 268 25% 95%;
+        --muted-foreground: 260 10% 50%;
+
+        /* ── Accent (hover/active bg + text) ─────────────── */
+        --accent: 268 30% 93%;           /* soft lavender hover */
+        --accent-foreground: 262 50% 30%;
+
+        /* ── Destructive ──────────────────────────────────── */
+        --destructive: 0 84% 60%;
         --destructive-foreground: 0 0% 98%;
-        --border: 240 5.9% 90%;
-        --input: 240 5.9% 90%;
-        --ring: 240 10% 3.9%;
-        --radius: 0.5rem;
-        --sidebar-background: 0 0% 98%;
-        --sidebar-foreground: 240 5.3% 26.1%;
-        --sidebar-primary: 240 5.9% 10%;
-        --sidebar-primary-foreground: 0 0% 98%;
-        --sidebar-accent: 240 4.8% 95.9%;
-        --sidebar-accent-foreground: 240 5.9% 10%;
-        --sidebar-border: 220 13% 91%;
-        --sidebar-ring: 217.2 91.2% 59.8%;
+
+        /* ── Chrome ───────────────────────────────────────── */
+        --border: 268 25% 90%;           /* lavender border */
+        --input: 268 25% 90%;
+        --ring: 262 83% 58%;             /* violet focus ring */
+        --radius: 0.625rem;
+
+        /* ── Sidebar ──────────────────────────────────────── */
+        --sidebar: hsl(268 30% 98%);
+        --sidebar-foreground: hsl(260 30% 25%);
+        --sidebar-primary: hsl(262 83% 58%);
+        --sidebar-primary-foreground: hsl(0 0% 100%);
+        --sidebar-accent: hsl(268 30% 93%);
+        --sidebar-accent-foreground: hsl(262 50% 30%);
+        --sidebar-border: hsl(268 25% 90%);
+        --sidebar-ring: hsl(262 83% 58%);
     }
 
     .dark {
-        --background: 240 10% 3.9%;
-        --foreground: 0 0% 98%;
-        --card: 240 10% 3.9%;
-        --card-foreground: 0 0% 98%;
-        --popover: 240 10% 3.9%;
-        --popover-foreground: 0 0% 98%;
-        --primary: 0 0% 98%;
-        --primary-foreground: 240 5.9% 10%;
-        --secondary: 240 3.7% 15.9%;
-        --secondary-foreground: 0 0% 98%;
-        --muted: 240 3.7% 15.9%;
-        --muted-foreground: 240 5% 64.9%;
-        --accent: 240 3.7% 15.9%;
-        --accent-foreground: 0 0% 98%;
-        --destructive: 0 62.8% 30.6%;
+        /* ── Surface — Midnight Plum ──────────────────────── */
+        --background: 260 28% 7%;        /* #0d0b18 deep midnight */
+        --foreground: 270 30% 95%;       /* warm lavender-white */
+
+        --card: 260 25% 10%;             /* #16121e dark plum */
+        --card-foreground: 270 30% 95%;
+        --popover: 260 25% 10%;
+        --popover-foreground: 270 30% 95%;
+
+        /* ── Primary — Soft Bright Violet ─────────────────── */
+        --primary: 266 88% 75%;          /* #b788f7 */
+        --primary-foreground: 260 30% 5%;
+
+        /* ── Secondary / Muted ────────────────────────────── */
+        --secondary: 260 18% 16%;        /* #22182e */
+        --secondary-foreground: 270 20% 85%;
+        --muted: 260 20% 13%;            /* #1c1528 */
+        --muted-foreground: 260 10% 60%;
+
+        /* ── Accent ───────────────────────────────────────── */
+        --accent: 260 20% 17%;           /* #27193a subtle hover */
+        --accent-foreground: 270 40% 78%;
+
+        /* ── Destructive ──────────────────────────────────── */
+        --destructive: 0 63% 31%;
         --destructive-foreground: 0 0% 98%;
-        --border: 240 3.7% 15.9%;
-        --input: 240 3.7% 15.9%;
-        --ring: 240 4.9% 83.9%;
-        --sidebar-background: 240 5.9% 10%;
-        --sidebar-foreground: 240 4.8% 95.9%;
-        --sidebar-primary: 224.3 76.3% 48%;
-        --sidebar-primary-foreground: 0 0% 100%;
-        --sidebar-accent: 240 3.7% 15.9%;
-        --sidebar-accent-foreground: 240 4.8% 95.9%;
-        --sidebar-border: 240 3.7% 15.9%;
-        --sidebar-ring: 217.2 91.2% 59.8%;
+
+        /* ── Chrome ───────────────────────────────────────── */
+        --border: 260 20% 17%;           /* #261d38 */
+        --input: 260 20% 17%;
+        --ring: 266 70% 68%;             /* bright violet ring */
+
+        /* ── Sidebar ──────────────────────────────────────── */
+        --sidebar: hsl(260 25% 8%);
+        --sidebar-foreground: hsl(270 20% 82%);
+        --sidebar-primary: hsl(266 88% 75%);
+        --sidebar-primary-foreground: hsl(0 0% 100%);
+        --sidebar-accent: hsl(260 18% 16%);
+        --sidebar-accent-foreground: hsl(270 40% 78%);
+        --sidebar-border: hsl(260 20% 17%);
+        --sidebar-ring: hsl(266 70% 68%);
     }
 }
 
@@ -70,16 +99,128 @@
         @apply border-border;
     }
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground antialiased;
+    }
+    ::selection {
+        background-color: hsl(262 83% 58% / 0.15);
     }
 }
 
+@keyframes gentle-float {
+    0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate, 0deg)); }
+    50%       { transform: translateY(-9px) rotate(var(--tw-rotate, 0deg)); }
+}
+
 @layer utilities {
+    .font-hand {
+        font-family: var(--font-hand), cursive;
+    }
+    .font-display {
+        font-family: var(--font-serif), Georgia, serif;
+    }
     .animate-fade-up {
         animation: fade-up 0.4s ease-out forwards;
     }
     @keyframes fade-up {
-        from { opacity: 0; transform: translateY(12px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
+}
+
+/* ── Review prose ────────────────────────────────────────────────────────────
+   Styles for dangerouslySetInnerHTML-rendered Tiptap HTML content.
+   Scoped to .review-prose so it doesn't bleed into other areas.
+─────────────────────────────────────────────────────────────────────────── */
+.review-prose {
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: hsl(var(--muted-foreground));
+    word-break: break-words;
+}
+.review-prose p {
+    margin-bottom: 0.75em;
+}
+.review-prose p:last-child {
+    margin-bottom: 0;
+}
+.review-prose h2 {
+    font-family: var(--font-serif), Georgia, serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: hsl(var(--foreground));
+    margin-top: 1.5em;
+    margin-bottom: 0.4em;
+}
+.review-prose h3 {
+    font-family: var(--font-serif), Georgia, serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: hsl(var(--foreground) / 0.8);
+    margin-top: 1.25em;
+    margin-bottom: 0.35em;
+}
+.review-prose strong {
+    font-weight: 600;
+    color: hsl(var(--foreground) / 0.85);
+}
+.review-prose em {
+    font-style: italic;
+}
+.review-prose s {
+    text-decoration: line-through;
+    color: hsl(var(--muted-foreground) / 0.5);
+}
+.review-prose blockquote {
+    border-left: 2px solid hsl(var(--primary) / 0.45);
+    padding-left: 1rem;
+    margin: 1em 0;
+    color: hsl(var(--muted-foreground) / 0.75);
+    font-style: italic;
+}
+.review-prose ul {
+    list-style-type: disc;
+    padding-left: 1.4em;
+    margin-bottom: 0.75em;
+}
+.review-prose ol {
+    list-style-type: decimal;
+    padding-left: 1.4em;
+    margin-bottom: 0.75em;
+}
+.review-prose li {
+    margin-bottom: 0.2em;
+}
+.review-prose code {
+    font-family: ui-monospace, "Cascadia Code", monospace;
+    font-size: 0.8em;
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground) / 0.85);
+    padding: 0.1em 0.35em;
+    border-radius: 0.25rem;
+}
+.review-prose hr {
+    border: none;
+    border-top: 1px solid hsl(var(--border));
+    margin: 1.25em 0;
+}
+
+@theme inline {
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
 }

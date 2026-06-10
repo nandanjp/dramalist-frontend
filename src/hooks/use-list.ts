@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch, buildQS } from "@/lib/api";
 import type {
@@ -53,6 +54,31 @@ export function usePublicList(userID: string, params: ListParams = {}) {
     });
 }
 
+/**
+ * Returns a Set of catalog_ids in the user's list.
+ * All instances on the same page share one TanStack Query cache entry.
+ * Use for O(1) membership checks (InListIndicator, etc.).
+ */
+export function useListCatalogSet(): Set<string> {
+    const { data } = useListEntries({ limit: 1000 });
+    return useMemo(() => {
+        const set = new Set<string>();
+        if (data?.entries) {
+            for (const entry of data.entries) set.add(entry.catalog_id);
+        }
+        return set;
+    }, [data]);
+}
+
+/**
+ * Returns the full UserListEntry for a given catalog_id, or undefined if not in list.
+ * Used by AddToListButton to switch between add and edit mode.
+ */
+export function useListEntryCatalogId(catalogId: string): UserListEntry | undefined {
+    const { data } = useListEntries({ limit: 1000 });
+    return useMemo(() => data?.entries.find((e) => e.catalog_id === catalogId), [data, catalogId]);
+}
+
 export function useAddToList() {
     const qc = useQueryClient();
     return useMutation({
@@ -88,7 +114,9 @@ export function useUpdateListEntry(id: string) {
             await qc.cancelQueries({ queryKey: listKeys.all() });
 
             const previousDetail = qc.getQueryData<UserListEntry>(listKeys.detail(id));
-            const previousEntries = qc.getQueriesData<UserListResponse>({ queryKey: listKeys.all() });
+            const previousEntries = qc.getQueriesData<UserListResponse>({
+                queryKey: listKeys.all(),
+            });
 
             // Optimistically update detail cache
             if (previousDetail) {
@@ -100,9 +128,7 @@ export function useUpdateListEntry(id: string) {
                 if (!old) return old;
                 return {
                     ...old,
-                    entries: old.entries.map((e) =>
-                        e.id === id ? { ...e, ...newData } : e
-                    ),
+                    entries: old.entries.map((e) => (e.id === id ? { ...e, ...newData } : e)),
                 };
             });
 
@@ -133,7 +159,9 @@ export function useDeleteListEntry() {
         mutationFn: (id: string) => apiFetch(`/api/list/${id}`, { method: "DELETE" }),
         onMutate: async (id) => {
             await qc.cancelQueries({ queryKey: listKeys.all() });
-            const previousEntries = qc.getQueriesData<UserListResponse>({ queryKey: listKeys.all() });
+            const previousEntries = qc.getQueriesData<UserListResponse>({
+                queryKey: listKeys.all(),
+            });
 
             qc.setQueriesData<UserListResponse>({ queryKey: listKeys.all() }, (old) => {
                 if (!old) return old;

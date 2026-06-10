@@ -10,6 +10,7 @@ import {
 
 const LABELS: Record<string, string> = {
     "/dashboard": "Dashboard",
+    "/catalog": "Catalogue",
     "/list": "My List",
     "/search": "Search",
     "/reviews": "My Reviews",

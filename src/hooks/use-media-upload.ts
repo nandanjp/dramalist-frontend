@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useRef, useState } from "react";
 
 export type MediaEntityType = "catalog" | "actor" | "user";
 export type MediaMediaType = "poster" | "banner" | "thumbnail" | "avatar" | "profile";
@@ -26,10 +26,10 @@ export function useMediaUpload({
     onSuccess,
     onError,
 }: UseMediaUploadOptions): UseMediaUploadResult {
-    const [isUploading, setIsUploading] = React.useState(false);
-    const [progress, setProgress] = React.useState(0);
-    const [error, setError] = React.useState<string | null>(null);
-    const xhrRef = React.useRef<XMLHttpRequest | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [error, setError] = useState<string | null>(null);
+    const xhrRef = useRef<XMLHttpRequest | null>(null);
 
     function reset() {
         xhrRef.current?.abort();

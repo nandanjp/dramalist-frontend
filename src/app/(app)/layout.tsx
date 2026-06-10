@@ -1,7 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { AuthGate } from "@/components/auth/auth-gate";
 import { NavBreadcrumb } from "@/components/nav-breadcrumb";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 

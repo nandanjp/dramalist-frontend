@@ -156,7 +156,7 @@ export function ReviewEditor({ content = "", onChange, placeholder }: ReviewEdit
             {/* Editor */}
             <EditorContent
                 editor={editor}
-                className="prose prose-sm dark:prose-invert min-h-[280px] max-w-none cursor-text px-4 py-3 focus-within:outline-none [&_.ProseMirror]:min-h-[280px] [&_.ProseMirror]:outline-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]"
+                className="prose prose-sm dark:prose-invert [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground min-h-[280px] max-w-none cursor-text px-4 py-3 focus-within:outline-none [&_.ProseMirror]:min-h-[280px] [&_.ProseMirror]:outline-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]"
             />
 
             {/* Character count */}

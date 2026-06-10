@@ -21,7 +21,7 @@ export function CatalogCard({ entry, actions }: CatalogCardProps) {
                                 {entry.title}
                             </CardTitle>
                             {entry.original_title && (
-                                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                                <p className="text-muted-foreground mt-0.5 truncate text-xs">
                                     {entry.original_title}
                                 </p>
                             )}
@@ -33,14 +33,16 @@ export function CatalogCard({ entry, actions }: CatalogCardProps) {
                 </CardHeader>
 
                 <CardContent className="flex flex-1 flex-col justify-between space-y-2">
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                    <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
                         {entry.year && <span>{entry.year}</span>}
                         {entry.country && <span>{entry.country}</span>}
                         <span className="capitalize">{entry.airing_status}</span>
                     </div>
 
                     {entry.synopsis && (
-                        <p className="line-clamp-2 text-xs text-muted-foreground">{entry.synopsis}</p>
+                        <p className="text-muted-foreground line-clamp-2 text-xs">
+                            {entry.synopsis}
+                        </p>
                     )}
 
                     {entry.genre.length > 0 && (

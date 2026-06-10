@@ -9,7 +9,8 @@ export const searchKeys = {
 export function useSearch(params: SearchParams, enabled = true) {
     return useQuery({
         queryKey: searchKeys.results(params),
-        queryFn: () => apiFetch<SearchResponse>(`/api/search?${buildQS(params as Record<string, unknown>)}`),
+        queryFn: () =>
+            apiFetch<SearchResponse>(`/api/search?${buildQS(params as Record<string, unknown>)}`),
         enabled,
         staleTime: 30 * 1000,
         placeholderData: (prev) => prev,
