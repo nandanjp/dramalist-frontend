@@ -2,24 +2,24 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
-RUN npm ci --no-audit
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # ── Stage 2: Build ────────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Inject NEXT_PUBLIC_ build-time env vars here if needed:
-# ARG NEXT_PUBLIC_SOMETHING
-# ENV NEXT_PUBLIC_SOMETHING=$NEXT_PUBLIC_SOMETHING
-
-RUN npm run build
+RUN pnpm build
 
 # ── Stage 3: Production runtime ───────────────────────────────────────────────
-# next.config.js must include  output: 'standalone'  for this to work.
+# next.config.ts must include  output: 'standalone'  for this to work.
 FROM node:20-alpine AS runner
 WORKDIR /app
 
